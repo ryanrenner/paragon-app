@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>MLS Lookup</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --panel: #ffffff;
+      --panel-2: #fafafb;
+      --border: #e4e4e7;
+      --ink: #18181b;
+      --muted: #6b7280;
+      --accent: #db2777;
+      --accent-ink: #ffffff;
+      --ok: #059669;
+      --warn: #d97706;
+      --danger: #dc2626;
+      --ai-bg: #fdf2f8;
+      --ai-border: #f9a8d4;
+      --radius: 10px;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 18px 16px 72px; }
+    header.app {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    header.app h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    header.app .byline {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Lookup input */
+    .lookup {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .lookup-row {
+      display: flex;
+      gap: 8px;
+    }
+    .lookup-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 16px;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      min-width: 0;
+    }
+    .lookup-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.18);
+    }
+    .lookup-button {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border: 0;
+      border-radius: 8px;
+      padding: 0 18px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      min-width: 96px;
+      transition: background-color 0.15s;
+    }
+    .lookup-button:hover { background: #be185d; }
+    .lookup-button:disabled {
+      background: #d4d4d8;
+      cursor: not-allowed;
+    }
+    .lookup-hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Status */
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--ink);
+      font-size: 14px;
+      display: none;
+    }
+    .status.is-visible { display: block; }
+    .status.is-error { background: #fef2f2; border-color: #fecaca; color: #7f1d1d; }
+    .status .spinner {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--muted);
+      border-top-color: transparent;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: -1px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    .results {
+      margin-top: 20px;
+      display: none;
+    }
+    .results.is-visible { display: block; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+    .card.ai {
+      background: var(--ai-bg);
+      border-color: var(--ai-border);
+    }
+    .card.ai h2 { color: var(--accent); }
+    .card.ai .analysis {
+      white-space: pre-wrap;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .header-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .cover {
+      width: 180px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
+    .title-block h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+    .title-block .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .title-block .sub a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .title-block .sub a:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      background: #e5e7eb;
+      color: #374151;
+      border: 1px solid transparent;
+    }
+    .badge.status-active { background: #dcfce7; color: #14532d; }
+    .badge.status-new { background: #dbeafe; color: #1e3a8a; }
+    .badge.status-pending { background: #fef3c7; color: #78350f; }
+    .badge.status-sold { background: #f3f4f6; color: #374151; }
+    .badge.status-expired { background: #fee2e2; color: #7f1d1d; }
+    .badge.status-withdrawn { background: #fee2e2; color: #7f1d1d; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
+    }
+    .stat {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .stat .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .stat .value {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 2px;
+      word-wrap: break-word;
+    }
+
+    .remarks {
+      white-space: pre-wrap;
+      font-size: 15px;
+    }
+
+    /* Documents */
+    .docs .doc {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .docs .doc:first-child { border-top: 0; }
+    .docs .doc .name a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .docs .doc .name a:hover { text-decoration: underline; }
+    .docs .doc .meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* History */
+    .history-group { border-top: 1px solid var(--border); padding: 10px 0; }
+    .history-group:first-child { border-top: 0; }
+    .history-group .mls-label { font-weight: 600; margin-bottom: 6px; }
+    .history-events { list-style: none; margin: 0; padding: 0; }
+    .history-events li {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px;
+      padding: 4px 0;
+      font-size: 14px;
+      border-top: 1px dashed var(--border);
+    }
+    .history-events li:first-child { border-top: 0; }
+    .history-events .date { color: var(--muted); }
+
+    /* Collapsible */
+    details.all-fields summary {
+      cursor: pointer;
+      list-style: none;
+      color: var(--accent);
+      font-weight: 600;
+      padding: 6px 0;
+    }
+    details.all-fields summary::-webkit-details-marker { display: none; }
+    details.all-fields summary::before {
+      content: "▸ ";
+    }
+    details.all-fields[open] summary::before {
+      content: "▾ ";
+    }
+    .fields-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    .fields-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .fields-table td.label {
+      color: var(--muted);
+      width: 46%;
+      font-weight: 500;
+    }
+    .fields-table td.value { word-break: break-word; }
+
+    /* History list (bottom) */
+    .recent {
+      margin-top: 24px;
+    }
+    .recent h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .recent-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.12s;
+    }
+    .recent-item:hover { border-color: #9ca3af; }
+    .recent-item .meta { flex: 1; min-width: 0; }
+    .recent-item .address {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .recent-item .sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .recent-item .rerun {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .recent-item .rerun:hover { background: var(--panel-2); border-color: var(--accent); color: var(--accent); }
+
+    .empty-note {
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    @media (max-width: 540px) {
+      .lookup-row { flex-direction: column; }
+      .lookup-button { padding: 12px; }
+      .cover { width: 100%; height: 180px; }
+      .history-events li { grid-template-columns: 90px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <h1>MLS Lookup</h1>
+      <span class="byline" id="clockByline"></span>
+    </header>
+
+    <section class="lookup" aria-label="Lookup a listing">
+      <form id="lookupForm" class="lookup-row" autocomplete="off">
+        <input
+          id="lookupInput"
+          class="lookup-input"
+          type="text"
+          placeholder="Enter MLS # or address"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          inputmode="text"
+        />
+        <button id="lookupButton" class="lookup-button" type="submit">Look Up</button>
+      </form>
+      <div class="lookup-hint">Try <code>22610267</code> or <code>3503 S 152nd St</code></div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" class="results" aria-live="polite"></section>
+
+    <section class="recent" aria-label="Recent lookups">
+      <h2>Recent Lookups</h2>
+      <div id="recentList" class="recent-list"></div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      const els = {
+        form: $('#lookupForm'),
+        input: $('#lookupInput'),
+        button: $('#lookupButton'),
+        status: $('#status'),
+        results: $('#results'),
+        recent: $('#recentList'),
+        clockByline: $('#clockByline'),
+      };
+
+      // ---------- Helpers ----------
+
+      function escapeHtml(s) {
+        if (s == null) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatChicago(dtString) {
+        if (!dtString) return '';
+        try {
+          const d = new Date(dtString);
+          return d.toLocaleString('en-US', {
+            timeZone: 'America/Chicago',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          });
+        } catch {
+          return dtString;
+        }
+      }
+
+      function statusBadge(status) {
+        if (!status) return '';
+        const cls = 'status-' + String(status).toLowerCase().replace(/[^a-z]/g, '');
+        return `<span class="badge ${cls}">${escapeHtml(status)}</span>`;
+      }
+
+      function setStatus(text, { error = false, spinner = false } = {}) {
+        if (!text) {
+          els.status.classList.remove('is-visible', 'is-error');
+          els.status.innerHTML = '';
+          return;
+        }
+        els.status.classList.add('is-visible');
+        els.status.classList.toggle('is-error', !!error);
+        const dot = spinner ? '<span class="spinner"></span>' : '';
+        els.status.innerHTML = dot + escapeHtml(text);
+      }
+
+      // Phased status during a lookup.
+      let statusTimer = null;
+      function startPhasedStatus() {
+        stopPhasedStatus();
+        const phases = [
+          'Connecting to Paragon...',
+          'Logging into Paragon...',
+          'Searching for the listing...',
+          'Scraping listing details...',
+          'Running AI analysis...',
+        ];
+        let i = 0;
+        setStatus(phases[i], { spinner: true });
+        statusTimer = setInterval(() => {
+          i = Math.min(i + 1, phases.length - 1);
+          setStatus(phases[i], { spinner: true });
+        }, 4500);
+      }
+      function stopPhasedStatus() {
+        if (statusTimer) {
+          clearInterval(statusTimer);
+          statusTimer = null;
+        }
+      }
+
+      // ---------- Rendering ----------
+
+      function renderResults(payload) {
+        const full = payload && payload.scraped;
+        if (!full) {
+          els.results.classList.remove('is-visible');
+          els.results.innerHTML = '';
+          return;
+        }
+        const f = full.fields || {};
+        const docs = full.documents || [];
+        const hist = full.history || [];
+
+        const street = f['Address'] || '';
+        const cityStateZip = [f['City'], f['State'], f['Zip']].filter(Boolean).join(', ');
+
+        const parts = [];
+
+        // AI card
+        parts.push(`
+          <div class="card ai">
+            <h2>AI Analysis</h2>
+            <div class="analysis">${
+              payload.ai_analysis
+                ? escapeHtml(payload.ai_analysis)
+                : '<span class="empty-note">AI analysis unavailable.</span>'
+            }</div>
+          </div>
+        `);
+
+        // Header card: cover + title + quick stats
+        const paragonUrl = full.url ? `<div class="sub"><a href="${escapeHtml(full.url)}" target="_blank" rel="noopener">Open in Paragon ↗</a></div>` : '';
+        const coverImg = full.cover_photo_url
+          ? `<img class="cover" src="${escapeHtml(full.cover_photo_url)}" alt="Cover photo" />`
+          : '<div class="cover" aria-hidden="true"></div>';
+        const variantNote = full.query_variant
+          ? `<div class="sub">Matched with: <em>${escapeHtml(full.query_variant)}</em></div>`
+          : '';
+
+        parts.push(`
+          <div class="card">
+            <div class="header-row">
+              ${coverImg}
+              <div class="title-block">
+                <h3>${escapeHtml(street || '(no address)')}</h3>
+                <div class="sub">${escapeHtml(cityStateZip)} · MLS# ${escapeHtml(f['MLS #'] || '')} ${statusBadge(f['Status'])}</div>
+                ${variantNote}
+                ${paragonUrl}
+              </div>
+            </div>
+          </div>
+        `);
+
+        // Stats row
+        const dom = (full.card && full.card.dom) || '';
+        const statList = [
+          { label: 'Price', value: f['Listing Price'] },
+          { label: 'Status', value: f['Status'] },
+          { label: 'DOM', value: dom },
+          { label: 'Beds', value: f['Bedrooms'] },
+          { label: 'Baths', value: f['Bathrooms Full/Half'] || f['Bathrooms'] },
+          { label: 'Total SqFt', value: f['Total Finished SqFt'] },
+          { label: 'Year Built', value: f['Year Built'] },
+          { label: 'Taxes', value: f['Tax Amount'] },
+        ];
+        parts.push(`
+          <div class="card">
+            <h2>Key Stats</h2>
+            <div class="stats">
+              ${statList
+                .map(
+                  (s) => `<div class="stat">
+                    <div class="label">${escapeHtml(s.label)}</div>
+                    <div class="value">${escapeHtml(s.value || '—')}</div>
+                  </div>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `);
+
+        // Showing / access
+        const lockBox = f['Lock Box Provider'];
+        const showingInstructions = f['Showing Instructions'];
+        const phone = extractPhone([showingInstructions, f['Agent Remarks']]);
+        if (lockBox || showingInstructions || phone) {
+          parts.push(`
+            <div class="card">
+              <h2>Showing & Access</h2>
+              ${lockBox ? `<div><strong>Lock Box:</strong> ${escapeHtml(lockBox)}</div>` : ''}
+              ${phone ? `<div><strong>Call:</strong> <a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}">${escapeHtml(phone)}</a></div>` : ''}
+              ${showingInstructions ? `<div style="margin-top:8px"><strong>Instructions:</strong><div class="remarks">${escapeHtml(showingInstructions)}</div></div>` : ''}
+            </div>
+          `);
+        }
+
+        // Public remarks
+        if (f['Public Remarks']) {
+          parts.push(`
+            <div class="card">
+              <h2>Public Remarks</h2>
+              <div class="remarks">${escapeHtml(f['Public Remarks'])}</div>
+            </div>
+          `);
+        }
+
+        // Agent remarks (only when populated)
+        if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
+          parts.push(`
+            <div class="card">
+              <h2>Agent Remarks</h2>
+              <div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>
+            </div>
+          `);
+        }
+
+        // Documents
+        if (docs.length > 0) {
+          parts.push(`
+            <div class="card docs">
+              <h2>Documents (${docs.length})</h2>
+              ${docs
+                .map(
+                  (d) => `<div class="doc">
+                    <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
+                    <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
+                  </div>`
+                )
+                .join('')}
+            </div>
+          `);
+        }
+
+        // Property History
+        if (hist.length > 0) {
+          parts.push(`
+            <div class="card">
+              <h2>Property History</h2>
+              ${hist
+                .map(
+                  (g) => `<div class="history-group">
+                    <div class="mls-label">MLS# ${escapeHtml(g.mls || '')}</div>
+                    <ul class="history-events">
+                      ${(g.events || [])
+                        .map(
+                          (e) => `<li>
+                            <span class="date">${escapeHtml([e.month, e.day].filter(Boolean).join(' '))} ${escapeHtml(e.year || '')}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
+                            <span>
+                              <strong>${escapeHtml(e.event || '')}</strong>${e.price ? ' — ' + escapeHtml(e.price) : ''}
+                            </span>
+                          </li>`
+                        )
+                        .join('')}
+                    </ul>
+                  </div>`
+                )
+                .join('')}
+            </div>
+          `);
+        }
+
+        // Full fields collapsible
+        parts.push(`
+          <div class="card">
+            <details class="all-fields">
+              <summary>All Fields (${Object.keys(f).length})</summary>
+              <table class="fields-table">
+                ${Object.entries(f)
+                  .map(
+                    ([k, v]) => `<tr>
+                      <td class="label">${escapeHtml(k)}</td>
+                      <td class="value">${escapeHtml(v)}</td>
+                    </tr>`
+                  )
+                  .join('')}
+              </table>
+            </details>
+          </div>
+        `);
+
+        els.results.innerHTML = parts.join('');
+        els.results.classList.add('is-visible');
+        els.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function extractPhone(strings) {
+        for (const s of strings) {
+          if (!s) continue;
+          const m = String(s).match(/\(?\b(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\b/);
+          if (m) return `(${m[1]}) ${m[2]}-${m[3]}`;
+        }
+        return null;
+      }
+
+      async function loadHistory() {
+        try {
+          const res = await fetch('/history');
+          if (!res.ok) throw new Error('history ' + res.status);
+          const data = await res.json();
+          renderHistory(data.lookups || []);
+        } catch (err) {
+          console.error(err);
+          els.recent.innerHTML = '<div class="empty-note">Could not load history.</div>';
+        }
+      }
+
+      function renderHistory(rows) {
+        if (!rows.length) {
+          els.recent.innerHTML = '<div class="empty-note">No lookups yet. Try one above.</div>';
+          return;
+        }
+        els.recent.innerHTML = rows
+          .map((r) => {
+            const when = formatChicago(r.queried_at);
+            const addr = r.address || r.query_input || '';
+            const sub = [r.mls_number ? 'MLS# ' + r.mls_number : null, r.status, r.price]
+              .filter(Boolean)
+              .join(' · ');
+            const err = r.error ? `<span class="badge status-expired">Error</span> ` : '';
+            return `<div class="recent-item" data-id="${escapeHtml(r.id)}">
+              <div class="meta">
+                <div class="address">${err}${escapeHtml(addr)}</div>
+                <div class="sub">${escapeHtml(when)}${sub ? ' · ' + escapeHtml(sub) : ''}</div>
+              </div>
+              <button class="rerun" data-id="${escapeHtml(r.id)}" title="Run a fresh scrape">Re-run</button>
+            </div>`;
+          })
+          .join('');
+      }
+
+      async function openHistoryItem(id) {
+        setStatus('Loading history item...', { spinner: true });
+        try {
+          const res = await fetch('/history/' + encodeURIComponent(id));
+          if (!res.ok) throw new Error('status ' + res.status);
+          const row = await res.json();
+          setStatus('');
+          if (row.error && !row.full_data_parsed) {
+            setStatus(row.error, { error: true });
+            els.results.classList.remove('is-visible');
+            els.results.innerHTML = '';
+            return;
+          }
+          renderResults({
+            scraped: row.full_data_parsed,
+            ai_analysis: row.ai_analysis,
+            ai_available: !!row.ai_analysis,
+          });
+        } catch (err) {
+          setStatus('Failed to load history item.', { error: true });
+          console.error(err);
+        }
+      }
+
+      async function doLookup(query) {
+        els.button.disabled = true;
+        els.results.classList.remove('is-visible');
+        els.results.innerHTML = '';
+        startPhasedStatus();
+        try {
+          const res = await fetch('/lookup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
+          const data = await res.json().catch(() => ({ error: 'Invalid server response.' }));
+          if (!res.ok) {
+            stopPhasedStatus();
+            setStatus(data.error || 'Lookup failed.', { error: true });
+            return;
+          }
+          stopPhasedStatus();
+          setStatus(
+            data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).'
+          );
+          renderResults(data);
+          await loadHistory();
+        } catch (err) {
+          stopPhasedStatus();
+          setStatus('Network error: ' + (err && err.message), { error: true });
+        } finally {
+          els.button.disabled = false;
+        }
+      }
+
+      async function rerunHistory(id) {
+        els.button.disabled = true;
+        els.results.classList.remove('is-visible');
+        els.results.innerHTML = '';
+        startPhasedStatus();
+        try {
+          const res = await fetch('/history/' + encodeURIComponent(id) + '/rerun', { method: 'POST' });
+          const data = await res.json().catch(() => ({ error: 'Invalid server response.' }));
+          if (!res.ok) {
+            stopPhasedStatus();
+            setStatus(data.error || 'Re-run failed.', { error: true });
+            return;
+          }
+          stopPhasedStatus();
+          setStatus(data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).');
+          renderResults(data);
+          await loadHistory();
+        } catch (err) {
+          stopPhasedStatus();
+          setStatus('Network error: ' + (err && err.message), { error: true });
+        } finally {
+          els.button.disabled = false;
+        }
+      }
+
+      // ---------- Events ----------
+
+      els.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = els.input.value.trim();
+        if (!q) {
+          els.input.focus();
+          return;
+        }
+        doLookup(q);
+      });
+
+      els.recent.addEventListener('click', (e) => {
+        const btn = e.target.closest('.rerun');
+        if (btn) {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          if (id) rerunHistory(id);
+          return;
+        }
+        const item = e.target.closest('.recent-item');
+        if (item && item.dataset.id) {
+          openHistoryItem(item.dataset.id);
+        }
+      });
+
+      // ---------- Init ----------
+
+      function updateClock() {
+        els.clockByline.textContent = formatChicago(new Date().toISOString()) + ' · Central';
+      }
+      updateClock();
+      setInterval(updateClock, 30000);
+
+      loadHistory();
+    })();
+  </script>
+</body>
+</html>

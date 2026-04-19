@@ -1,0 +1,52 @@
+<!--
+Documents accordion - single PDF row structure.
+The accordion wrapper is a .MuiAccordion-root; click the heading button to expand.
+Inside the expanded accordion, each PDF is a <li> with this structure.
+
+Fields to extract per document:
+- URL: href on either <a> (both point to the same PDF)
+- Name: text of the second <a> (the one without <svg>)
+- Size: <span> with size like "216.25 KB"
+- Date Added: <span> starting with "Added "
+- Visibility: <span> with "Public" or "Private"
+-->
+
+<div class="MuiPaper-root MuiAccordion-root Mui-expanded">
+  <h3>
+    <button aria-expanded="true">
+      <span>
+        <p class="css-19iygoh">Documents</p>
+      </span>
+    </button>
+  </h3>
+  <div class="MuiCollapse-root Mui-expanded">
+    <!-- Inside the expanded region: -->
+
+    <!-- One <li> per PDF document, like this: -->
+    <li>
+      <div>
+        <!-- Icon link -->
+        <a href="https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1126824.pdf" target="_blank">
+          <svg><title>Pdf</title></svg>
+        </a>
+      </div>
+      <div>
+        <span>
+          <!-- Name link (same URL, text label) -->
+          <a href="https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1126824.pdf" target="_blank">LBP</a>
+        </span>
+        <div>
+          <span>216.25 KB</span>
+          <div>
+            <svg></svg>
+            <span>Added 02/13/2026</span>
+          </div>
+          <div>
+            <span>Public</span>
+          </div>
+        </div>
+      </div>
+    </li>
+
+  </div>
+</div>

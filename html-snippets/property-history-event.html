@@ -1,0 +1,59 @@
+<!--
+Property History accordion - event block pattern.
+Each MLS# in the history has its own group, headed by <h6 weight="600">MLS_NUMBER</h6>.
+Within a group, year markers split the events. Each event has a date header and a detail pane.
+
+Walking order for extraction:
+1. <h6 weight="600"> = new MLS group starts (save current MLS)
+2. <div class="css-rbs0uv"> = year marker (save current year)
+3. <p>Mon<h6>DD</h6></p> = month/day (save current month/day)
+4. <div>12:02 AM</div> = time (save current time)
+5. <div class="css-6s8rp0"> = event detail pane (emit event record using running state)
+-->
+
+<!-- Start of an MLS group -->
+<h6 weight="600">22604189</h6>
+
+<!-- Year marker -->
+<div class="css-rbs0uv">2026</div>
+
+<!-- Event 1: date header + detail pane -->
+<div class="css-27dcjk">
+  <div>
+    <p>Mar<h6>3</h6></p>
+  </div>
+  <div>
+    <div>12:02 AM</div>
+  </div>
+</div>
+
+<div class="css-6s8rp0">
+  <p>Status: ACTIVE</p>
+  <p><span>General Date: </span>2/13/2026</p>
+  <p><span>Price: </span>$334,500</p>
+</div>
+
+<!-- Event 2: another date header + detail pane -->
+<div class="css-27dcjk">
+  <div>
+    <p>Feb<h6>27</h6></p>
+  </div>
+  <div>
+    <div>02:30 AM</div>
+  </div>
+</div>
+
+<div class="css-6s8rp0">
+  <p>Status: NEW</p>
+  <p><span>General Date: </span>2/13/2026</p>
+  <p><span>Price: </span>$334,500</p>
+</div>
+
+<!-- Observed event "types" (text before the first <p> break):
+     - "Status: ACTIVE" / "Status: NEW" / "Status: PENDING" / "Status: SOLD"
+     - "Status: EXPIRED" / "Status: WITHDRAWN"
+     - "First entry" (listing creation)
+     - "Current Entry" (for older historical records)
+     - "Listing Price" (price change)
+     - "Listing Price,Available to Show Date" (bundled change)
+-->

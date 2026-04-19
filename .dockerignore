@@ -1,0 +1,15 @@
+node_modules
+data
+.env
+.env.local
+.git
+.gitignore
+.DS_Store
+npm-debug.log*
+*.log
+.vscode
+.idea
+docs
+html-snippets
+samples
+README.md

@@ -1,0 +1,20 @@
+{
+  "_description": "Example extracted Documents section. Each PDF has a name (short code), URL, size, date added, and public/private visibility. PDFs are publicly accessible at the URL without authentication.",
+  "_document_count": 2,
+  "documents": [
+    {
+      "name": "LBP",
+      "url": "https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1126824.pdf",
+      "size": "216.25 KB",
+      "date_added": "02/13/2026",
+      "visibility": "Public"
+    },
+    {
+      "name": "SPCDS & Soil",
+      "url": "https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1127906.pdf",
+      "size": "1.26 MB",
+      "date_added": "02/23/2026",
+      "visibility": "Public"
+    }
+  ]
+}

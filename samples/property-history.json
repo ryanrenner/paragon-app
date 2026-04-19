@@ -1,0 +1,111 @@
+{
+  "_description": "Example extracted Property History. Contains current MLS# plus all prior MLS#s associated with this address. Events are ordered most-recent-first. For the AI, per decisions.md, only send a summary: prior MLS#s with their final status and final price.",
+  "_mls_group_count": 3,
+  "history": [
+    {
+      "mls": "22604189",
+      "events": [
+        {
+          "year": "2026",
+          "month": "Mar",
+          "day": "3",
+          "time": "12:02 AM",
+          "event": "Status: ACTIVE",
+          "general_date": "2/13/2026",
+          "price": "$334,500"
+        },
+        {
+          "year": "2026",
+          "month": "Feb",
+          "day": "27",
+          "time": "02:30 AM",
+          "event": "Status: NEW",
+          "general_date": "2/13/2026",
+          "price": "$334,500"
+        },
+        {
+          "year": "2026",
+          "month": "Feb",
+          "day": "13",
+          "time": "04:53 PM",
+          "event": "First entry",
+          "general_date": "2/13/2026",
+          "price": "$334,500"
+        }
+      ]
+    },
+    {
+      "mls": "22430375",
+      "events": [
+        {
+          "year": "2025",
+          "month": "Jun",
+          "day": "11",
+          "time": "03:40 PM",
+          "event": "Status: SOLD",
+          "general_date": "4/17/2025",
+          "price": "$285,000"
+        },
+        {
+          "year": "2025",
+          "month": "Apr",
+          "day": "18",
+          "time": "12:39 PM",
+          "event": "Status: PENDING",
+          "general_date": "4/17/2025",
+          "price": "$295,000"
+        },
+        {
+          "year": "2025",
+          "month": "Apr",
+          "day": "1",
+          "time": "05:10 PM",
+          "event": "Listing Price",
+          "general_date": "12/4/2024",
+          "price": "$295,000"
+        },
+        {
+          "year": "2025",
+          "month": "Feb",
+          "day": "17",
+          "time": "10:01 AM",
+          "event": "Listing Price,Available to Show Date",
+          "general_date": "12/4/2024",
+          "price": "$315,000"
+        },
+        {
+          "year": "2024",
+          "month": "Dec",
+          "day": "9",
+          "time": "12:02 AM",
+          "event": "Status: ACTIVE",
+          "general_date": "12/4/2024",
+          "price": "$334,900"
+        },
+        {
+          "year": "2024",
+          "month": "Dec",
+          "day": "4",
+          "time": "04:12 PM",
+          "event": "First entry",
+          "general_date": "12/4/2024",
+          "price": "$334,900"
+        }
+      ]
+    },
+    {
+      "mls": "20716199",
+      "events": [
+        {
+          "year": "2007",
+          "month": "Nov",
+          "day": "29",
+          "time": "11:02 AM",
+          "event": "Current Entry",
+          "general_date": "10/29/2007",
+          "price": "$123,500"
+        }
+      ]
+    }
+  ]
+}
