@@ -274,6 +274,30 @@
     .history-events li:first-child { border-top: 0; }
     .history-events .date { color: var(--muted); }
 
+    /* Performance timings card */
+    details.timings-details summary {
+      cursor: pointer;
+      list-style: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 4px 0;
+    }
+    details.timings-details summary::-webkit-details-marker { display: none; }
+    details.timings-details summary::before { content: "▸ "; }
+    details.timings-details[open] summary::before { content: "▾ "; }
+    .timing-rows { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+    .timing-row { display: grid; grid-template-columns: 160px 1fr 60px; gap: 8px; align-items: center; font-size: 13px; }
+    .timing-row .t-label { color: var(--muted); white-space: nowrap; }
+    .timing-bar-wrap { background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; }
+    .timing-bar { height: 100%; border-radius: 4px; background: var(--accent); opacity: 0.65; transition: width 0.3s; }
+    .timing-bar.session { background: #7c3aed; }
+    .timing-bar.search { background: #0891b2; }
+    .timing-bar.open { background: #059669; }
+    .timing-bar.ai { background: #d97706; }
+    .timing-row .t-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .timing-total { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: right; }
+
     /* Collapsible */
     details.all-fields summary {
       cursor: pointer;
@@ -497,6 +521,47 @@
 
       // ---------- Rendering ----------
 
+      function fmtMs(ms) {
+        if (ms == null) return '—';
+        if (ms >= 1000) return (ms / 1000).toFixed(1) + 's';
+        return ms + 'ms';
+      }
+
+      function renderTimings(timings) {
+        if (!timings || !Object.keys(timings).length) return '';
+        const phases = [
+          { key: 'queue_wait_ms', label: 'Queue wait',       cls: '' },
+          { key: 'session_ms',    label: 'Session / Login',  cls: 'session' },
+          { key: 'search_ms',     label: 'Search',           cls: 'search' },
+          { key: 'open_listing_ms',   label: 'Open listing', cls: 'open' },
+          { key: 'expand_fields_ms',  label: 'Expand fields',cls: '' },
+          { key: 'scrape_fields_ms',  label: 'Parse fields', cls: '' },
+          { key: 'scrape_docs_ms',    label: 'Documents',    cls: '' },
+          { key: 'scrape_history_ms', label: 'History',      cls: '' },
+          { key: 'ai_ms',         label: 'AI analysis',      cls: 'ai' },
+        ].filter(p => timings[p.key] != null);
+
+        const total = phases.reduce((s, p) => s + (timings[p.key] || 0), 0);
+        if (!total) return '';
+
+        const rows = phases.map(p => {
+          const ms = timings[p.key];
+          const pct = total > 0 ? Math.max(2, Math.round((ms / total) * 100)) : 0;
+          return `<div class="timing-row">
+            <div class="t-label">${escapeHtml(p.label)}</div>
+            <div class="timing-bar-wrap"><div class="timing-bar ${p.cls}" style="width:${pct}%"></div></div>
+            <div class="t-val">${escapeHtml(fmtMs(ms))}</div>
+          </div>`;
+        }).join('');
+
+        return `<div class="card">
+          <details class="timings-details">
+            <summary>Performance breakdown · total ${escapeHtml(fmtMs(total))}</summary>
+            <div class="timing-rows">${rows}</div>
+          </details>
+        </div>`;
+      }
+
       function renderResults(payload) {
         const full = payload && payload.scraped;
         if (!full) {
@@ -674,6 +739,9 @@
             </details>
           </div>
         `);
+
+        const timingsHtml = renderTimings(payload.timings);
+        if (timingsHtml) parts.push(timingsHtml);
 
         els.results.innerHTML = parts.join('');
         els.results.classList.add('is-visible');

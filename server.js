@@ -121,12 +121,22 @@ async function runLookup(queryInput, opts = {}) {
   const queue = getQueue();
   const session = getSession();
 
+  // Shared timings object — populated by this function and by scrapeListing.
+  const timings = {};
+  const enqueuedAt = Date.now();
+
   let scraped;
   try {
     scraped = await queue.run(async () => {
+      timings.queue_wait_ms = Date.now() - enqueuedAt;
+
+      const sessionStart = Date.now();
       const page = await session.getPage();
+      timings.session_ms = Date.now() - sessionStart;
+
       try {
-        const result = await scrapeListing(page, trimmed);
+        // scrapeListing populates timings with per-phase durations.
+        const result = await scrapeListing(page, trimmed, timings);
         session.touch();
         return result;
       } catch (err) {
@@ -165,6 +175,7 @@ async function runLookup(queryInput, opts = {}) {
     error: null,
   });
 
+  const aiStart = Date.now();
   let aiResult = null;
   if (!opts.skipAi) {
     aiResult = await analyzeListing(scraped);
@@ -172,12 +183,14 @@ async function runLookup(queryInput, opts = {}) {
       updateAiAnalysis(id, aiResult.text);
     }
   }
+  timings.ai_ms = Date.now() - aiStart;
 
   return {
     id,
     scraped,
     ai_analysis: aiResult ? aiResult.text : null,
     ai_available: Boolean(aiResult),
+    timings,
   };
 }
 

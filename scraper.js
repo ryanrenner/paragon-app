@@ -652,8 +652,18 @@ function looksLikeMlsNumber(input) {
 /**
  * Top-level scrape. Uses an already-logged-in page (from session.js).
  * Returns the Stage 2 shape described in docs/03-data-shapes.md.
+ *
+ * `timings` is an optional object that will be populated with per-phase
+ * millisecond durations (keys: search_ms, open_listing_ms, expand_fields_ms,
+ * scrape_fields_ms, scrape_docs_ms, scrape_history_ms).
  */
-async function scrapeListing(page, query) {
+async function scrapeListing(page, query, timings = {}) {
+  // Helper: start a timer, returns a function that stops it and records the duration.
+  const mark = (key) => {
+    const start = Date.now();
+    return () => { timings[key] = Date.now() - start; };
+  };
+
   const cleaned = String(query).trim();
   if (!cleaned) throw new Error('Empty query.');
 
@@ -662,15 +672,20 @@ async function scrapeListing(page, query) {
 
   let cards;
   if (isMls) {
+    const done = mark('search_ms');
     await searchByMls(page, cleaned);
     cards = await readSearchResultCards(page);
+    done();
   } else {
+    const done = mark('search_ms');
     const { variation, results } = await searchByAddress(page, cleaned);
     if (!variation) {
+      done();
       throw new Error('No active listing found for that address or MLS number.');
     }
     variationLabel = variation.label;
     cards = results;
+    done();
   }
 
   if (!cards || cards.length === 0) {
@@ -697,12 +712,26 @@ async function scrapeListing(page, query) {
   // canonical thumbnail URL for the MLS.
   const cardCoverPhoto = best.cover_photo_url || null;
 
+  const doneOpen = mark('open_listing_ms');
   await openListing(page, best.mls);
-  await expandAllFieldsDetail(page);
+  doneOpen();
 
+  const doneExpand = mark('expand_fields_ms');
+  await expandAllFieldsDetail(page);
+  doneExpand();
+
+  const doneFields = mark('scrape_fields_ms');
   const fields = await scrapeAllFields(page);
+  doneFields();
+
+  const doneDocs = mark('scrape_docs_ms');
   const documents = await scrapeDocuments(page);
+  doneDocs();
+
+  const doneHistory = mark('scrape_history_ms');
   const history = await scrapeHistory(page);
+  doneHistory();
+
   const coverPhotoUrl = cardCoverPhoto || (await scrapeCoverPhoto(page, best.mls));
 
   return {
