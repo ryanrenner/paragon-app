@@ -691,7 +691,7 @@
 
       async function loadHistory() {
         try {
-          const res = await fetch('/history');
+          const res = await fetch('/api/history');
           if (!res.ok) throw new Error('history ' + res.status);
           const data = await res.json();
           renderHistory(data.lookups || []);
@@ -725,10 +725,10 @@
           .join('');
       }
 
-      async function openHistoryItem(id) {
+      async function openHistoryItem(id, { pushUrl = true } = {}) {
         setStatus('Loading history item...', { spinner: true });
         try {
-          const res = await fetch('/history/' + encodeURIComponent(id));
+          const res = await fetch('/api/history/' + encodeURIComponent(id));
           if (!res.ok) throw new Error('status ' + res.status);
           const row = await res.json();
           setStatus('');
@@ -737,6 +737,11 @@
             els.results.classList.remove('is-visible');
             els.results.innerHTML = '';
             return;
+          }
+          if (pushUrl) {
+            const addr = row.address || row.query_input || 'Result';
+            history.pushState({ historyId: id }, addr, '/history/' + id);
+            document.title = addr + ' · MLS Lookup';
           }
           renderResults({
             scraped: row.full_data_parsed,
@@ -770,6 +775,11 @@
           setStatus(
             data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).'
           );
+          if (data.id) {
+            const addr = (data.scraped && data.scraped.fields && data.scraped.fields['Address']) || query;
+            history.pushState({ historyId: data.id }, addr, '/history/' + data.id);
+            document.title = addr + ' · MLS Lookup';
+          }
           renderResults(data);
           await loadHistory();
         } catch (err) {
@@ -786,7 +796,7 @@
         els.results.innerHTML = '';
         startPhasedStatus();
         try {
-          const res = await fetch('/history/' + encodeURIComponent(id) + '/rerun', { method: 'POST' });
+          const res = await fetch('/api/history/' + encodeURIComponent(id) + '/rerun', { method: 'POST' });
           const data = await res.json().catch(() => ({ error: 'Invalid server response.' }));
           if (!res.ok) {
             stopPhasedStatus();
@@ -795,6 +805,11 @@
           }
           stopPhasedStatus();
           setStatus(data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).');
+          if (data.id) {
+            const addr = (data.scraped && data.scraped.fields && data.scraped.fields['Address']) || '';
+            history.pushState({ historyId: data.id }, addr, '/history/' + data.id);
+            document.title = (addr || 'Result') + ' · MLS Lookup';
+          }
           renderResults(data);
           await loadHistory();
         } catch (err) {
@@ -838,6 +853,28 @@
       }
       updateClock();
       setInterval(updateClock, 30000);
+
+      // Browser back/forward: restore the right result or clear back to home.
+      window.addEventListener('popstate', (e) => {
+        const id = e.state && e.state.historyId;
+        if (id) {
+          openHistoryItem(id, { pushUrl: false });
+        } else {
+          // Navigated back to /
+          els.results.classList.remove('is-visible');
+          els.results.innerHTML = '';
+          setStatus('');
+          document.title = 'MLS Lookup';
+        }
+      });
+
+      // If the page was opened directly at /history/:id, auto-load that result.
+      (function checkInitialUrl() {
+        const m = location.pathname.match(/^\/history\/(\d+)$/);
+        if (m) {
+          openHistoryItem(m[1], { pushUrl: false });
+        }
+      })();
 
       loadHistory();
     })();

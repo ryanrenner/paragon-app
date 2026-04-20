@@ -6,9 +6,10 @@
  * Express app. HTTP Basic Auth in front of everything. Routes:
  *   GET  /              — serves public/index.html
  *   POST /lookup        — runs a scrape (optionally AI-analyzed) and returns JSON
- *   GET  /history       — last 20 lookups
- *   GET  /history/:id   — one historical record
- *   POST /history/:id/rerun — rescrape using the original query
+ *   GET  /api/history       — last 20 lookups (JSON)
+ *   GET  /api/history/:id   — one historical record (JSON)
+ *   POST /api/history/:id/rerun — rescrape using the original query (JSON)
+ *   GET  /history/:id   — serves index.html (SPA route for shareable result URLs)
  *   GET  /healthz       — unauthenticated health probe
  *
  * Scrapes are serialized through queue.js so two concurrent requests can't
@@ -235,7 +236,7 @@ app.post('/lookup', async (req, res) => {
   }
 });
 
-app.get('/history', (_req, res) => {
+app.get('/api/history', (_req, res) => {
   try {
     const rows = getRecentLookups(20);
     res.json({ lookups: rows });
@@ -244,7 +245,7 @@ app.get('/history', (_req, res) => {
   }
 });
 
-app.get('/history/:id', (req, res) => {
+app.get('/api/history/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (!Number.isFinite(id)) return res.status(400).json({ error: 'Bad id.' });
@@ -263,7 +264,7 @@ app.get('/history/:id', (req, res) => {
   }
 });
 
-app.post('/history/:id/rerun', async (req, res) => {
+app.post('/api/history/:id/rerun', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (!Number.isFinite(id)) return res.status(400).json({ error: 'Bad id.' });

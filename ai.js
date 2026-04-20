@@ -3,18 +3,23 @@
 /**
  * ai.js
  *
- * Claude API wrapper. Given a Stage 2 scraped listing (see
- * docs/03-data-shapes.md), extract the AI-input subset, call Claude, and
- * return the text of the response.
+ * OpenRouter API wrapper. Given a Stage 2 scraped listing (see
+ * docs/03-data-shapes.md), extract the AI-input subset, call the configured
+ * model via OpenRouter, and return the text of the response.
+ *
+ * Configuration is via environment variables:
+ *   OPENROUTER_API_KEY  — required; your OpenRouter API key
+ *   AI_MODEL            — optional; defaults to google/gemini-2.5-flash-lite
+ *   AI_MAX_TOKENS       — optional; defaults to 1000
  *
  * Failure modes are tolerated: if the API key is missing or the call
  * fails, analyzeListing returns null and the server still ships the
  * scraped data with an "AI analysis unavailable" indicator.
  */
 
-const MODEL = 'claude-sonnet-4-20250514';
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const MAX_TOKENS = 1000;
+const DEFAULT_MODEL = 'google/gemini-2.5-flash-lite';
+const DEFAULT_MAX_TOKENS = 1000;
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 /**
  * Pick the subset of fields sent to Claude, per docs/01-decisions.md.
@@ -114,49 +119,53 @@ function buildPrompt(aiInput) {
 }
 
 /**
- * Main entry: returns { text, input } on success, null on failure.
+ * Main entry: returns { text, input, model } on success, null on failure.
  * Caller should treat null as "AI unavailable" and still return scraped data.
  */
 async function analyzeListing(stage2) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    console.warn('[ai] ANTHROPIC_API_KEY not set; skipping AI analysis.');
+    console.warn('[ai] OPENROUTER_API_KEY not set; skipping AI analysis.');
     return null;
   }
 
+  const model = process.env.AI_MODEL || DEFAULT_MODEL;
+  const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || DEFAULT_MAX_TOKENS;
+
   const aiInput = buildAiInput(stage2);
   const prompt = buildPrompt(aiInput);
+
+  console.log(`[ai] Using model: ${model}, max_tokens: ${maxTokens}`);
 
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
+        model,
+        max_tokens: maxTokens,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-      console.error(`[ai] Claude API error ${res.status}: ${body.slice(0, 500)}`);
+      console.error(`[ai] OpenRouter API error ${res.status}: ${body.slice(0, 500)}`);
       return null;
     }
 
     const data = await res.json();
-    const text = (data && data.content && data.content[0] && data.content[0].text) || null;
+    const text = (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || null;
     if (!text) {
-      console.error('[ai] Claude returned empty content.');
+      console.error('[ai] OpenRouter returned empty content.');
       return null;
     }
-    return { text, input: aiInput };
+    return { text, input: aiInput, model };
   } catch (err) {
-    console.error('[ai] Claude API call failed:', err);
+    console.error('[ai] OpenRouter API call failed:', err);
     return null;
   }
 }
@@ -165,5 +174,5 @@ module.exports = {
   analyzeListing,
   buildAiInput,
   // exported for debugging/tests
-  _internal: { MODEL, API_URL, buildPrompt },
+  _internal: { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, API_URL, buildPrompt },
 };
