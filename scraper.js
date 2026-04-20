@@ -129,10 +129,24 @@ async function waitForResultsOrEmpty(page) {
 async function searchByMls(page, mlsNumber) {
   await gotoResidentialSearch(page);
   const mlsField = page.getByLabel('MLS #');
+  const value = String(mlsNumber).trim();
   await mlsField.click();
-  await mlsField.fill(String(mlsNumber).trim());
-  // MLS# is an autocomplete; pressing Enter after typing accepts input.
-  await mlsField.press('Enter').catch(() => {});
+  // Clear any stale value first. fill('') is fine for clearing because we're
+  // not relying on React to notice.
+  await mlsField.fill('');
+  // Use pressSequentially so React's onChange fires for every keystroke —
+  // page.fill() bypasses synthetic events on MUI/React inputs, which caused
+  // Paragon to submit the user's "My Default" saved search instead of an
+  // MLS-filtered one.
+  await mlsField.pressSequentially(value, { delay: 30 });
+  // Verify the field actually holds what we expect before submitting. If this
+  // ever trips, it's the real bug — do not proceed with a stale/empty field.
+  const actual = (await mlsField.inputValue()).trim();
+  if (actual !== value) {
+    throw new Error(`MLS# field did not accept input. Expected "${value}", got "${actual}".`);
+  }
+  // Intentionally do NOT press Enter here — on an empty/unsynced field, Enter
+  // submits Paragon's default search. Clicking the Search button is enough.
   await clickSearch(page);
   await waitForResultsOrEmpty(page);
 }
@@ -666,6 +680,17 @@ async function scrapeListing(page, query) {
   const best = selectBestResult(cards);
   if (!best || !best.mls) {
     throw new Error('Could not determine which listing to open.');
+  }
+
+  // Safety belt: when the caller passed an MLS#, the card we're about to open
+  // MUST have that same MLS#. If it doesn't, the search submitted with
+  // unintended criteria (e.g. Paragon's "My Default" saved search) and we're
+  // about to scrape the wrong listing. Fail loudly instead.
+  if (isMls && String(best.mls).trim() !== cleaned) {
+    throw new Error(
+      `Search returned MLS ${best.mls} but MLS ${cleaned} was requested. ` +
+      `This usually means the MLS# field did not get populated before submit.`
+    );
   }
 
   // Capture the card's cover photo up front — the results page has the
