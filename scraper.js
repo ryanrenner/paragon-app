@@ -336,7 +336,10 @@ async function openListing(page, mls) {
 
 async function expandAllFieldsDetail(page) {
   // Click the pink "All Fields Detail" link inside Property Details.
-  await page.getByText('All Fields Detail', { exact: false }).first().click();
+  // Use force: true to bypass actionability checks — a MUI-generated overlay
+  // (css-tnlpd7 inside css-12tfjcl) intercepts pointer events in headless
+  // Chromium on Linux even when the target is visible and stable.
+  await page.getByText('All Fields Detail', { exact: false }).first().click({ force: true });
   // Wait for the expanded section header to render, then wait for at least
   // one known label to appear.
   await page.waitForSelector('p.css-bbdbyg:has-text("All Fields Detail")', { timeout: 20000 });
