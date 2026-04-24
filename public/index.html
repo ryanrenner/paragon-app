@@ -238,6 +238,26 @@
     }
 
     /* Documents */
+    .docs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .docs-header h2 { margin: 0; }
+    .copy-links-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.12s, color 0.12s;
+    }
+    .copy-links-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .copy-links-btn.copied { border-color: var(--ok); color: var(--ok); }
     .docs .doc {
       display: flex;
       justify-content: space-between;
@@ -759,7 +779,24 @@
           `);
         }
 
-        // 5. Public Remarks (collapsed toggle, closed by default)
+        // 5. Documents (with copy-all-links button)
+        if (docs.length > 0) {
+          const docUrls = docs.map(d => d.url).filter(Boolean);
+          parts.push(`
+            <div class="card docs">
+              <div class="docs-header">
+                <h2>Documents (${docs.length})</h2>
+                ${docUrls.length > 0 ? `<button class="copy-links-btn" data-urls="${escapeHtml(docUrls.join('\n'))}">Copy links</button>` : ''}
+              </div>
+              ${docs.map(d => `<div class="doc">
+                <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
+                <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
+              </div>`).join('')}
+            </div>
+          `);
+        }
+
+        // 6. Public Remarks (collapsed toggle, closed by default)
         if (f['Public Remarks']) {
           parts.push(`
             <div class="card">
@@ -771,25 +808,12 @@
           `);
         }
 
-        // 6. Agent Remarks
+        // 7. Agent Remarks
         if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
           parts.push(`
             <div class="card">
               <h2>Agent Remarks</h2>
               <div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>
-            </div>
-          `);
-        }
-
-        // 7. Documents
-        if (docs.length > 0) {
-          parts.push(`
-            <div class="card docs">
-              <h2>Documents (${docs.length})</h2>
-              ${docs.map(d => `<div class="doc">
-                <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
-                <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
-              </div>`).join('')}
             </div>
           `);
         }
@@ -989,11 +1013,27 @@
       });
 
       els.results.addEventListener('click', (e) => {
-        const btn = e.target.closest('.ai-more-btn');
-        if (btn) {
-          const body = btn.previousElementSibling;
+        const aiBtn = e.target.closest('.ai-more-btn');
+        if (aiBtn) {
+          const body = aiBtn.previousElementSibling;
           const collapsed = body.classList.toggle('ai-collapsed');
-          btn.textContent = collapsed ? 'View more' : 'View less';
+          aiBtn.textContent = collapsed ? 'View more' : 'View less';
+        }
+
+        const copyBtn = e.target.closest('.copy-links-btn');
+        if (copyBtn) {
+          const urls = copyBtn.dataset.urls || '';
+          navigator.clipboard.writeText(urls).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy links';
+              copyBtn.classList.remove('copied');
+            }, 2000);
+          }).catch(() => {
+            copyBtn.textContent = 'Failed';
+            setTimeout(() => { copyBtn.textContent = 'Copy links'; }, 2000);
+          });
         }
       });
 
