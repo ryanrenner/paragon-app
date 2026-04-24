@@ -331,6 +331,63 @@
     }
     .fields-table td.value { word-break: break-word; }
 
+    /* Price in header card */
+    .price-display {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    /* AI analysis prose rendering */
+    .ai-prose { font-size: 15px; line-height: 1.6; }
+    .ai-prose h3, .ai-prose h4 { font-size: 1em; font-weight: 700; margin: 0.8em 0 0.2em; color: var(--ink); }
+    .ai-prose p { margin: 0.4em 0; }
+    .ai-prose ul, .ai-prose ol { margin: 0.4em 0; padding-left: 20px; }
+    .ai-prose li { margin: 0.15em 0; }
+    .ai-prose hr { border: none; border-top: 1px solid var(--ai-border); margin: 8px 0; }
+    .ai-body.ai-collapsed {
+      max-height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+    .ai-body.ai-collapsed::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50px;
+      background: linear-gradient(transparent, var(--ai-bg));
+      pointer-events: none;
+    }
+    .ai-more-btn {
+      display: block;
+      background: none;
+      border: 1px solid var(--ai-border);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .ai-more-btn:hover { background: rgba(219,39,119,0.06); }
+
+    /* Section toggles (e.g. Public Remarks) */
+    details.section-toggle summary {
+      cursor: pointer;
+      list-style: none;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 4px 0;
+    }
+    details.section-toggle summary::-webkit-details-marker { display: none; }
+    details.section-toggle summary::before { content: "▸ "; }
+    details.section-toggle[open] summary::before { content: "▾ "; }
+
     /* History list (bottom) */
     .recent {
       margin-top: 24px;
@@ -562,6 +619,55 @@
         </div>`;
       }
 
+      function markdownToHtml(md) {
+        if (!md) return '';
+        function inlineFmt(s) {
+          return escapeHtml(s)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>');
+        }
+        const out = [];
+        const lines = md.split('\n');
+        let i = 0;
+        while (i < lines.length) {
+          const line = lines[i];
+          const t = line.trim();
+          const hm = t.match(/^(#{1,4})\s+(.*)/);
+          if (hm) {
+            const lvl = hm[1].length <= 2 ? 3 : 4;
+            out.push(`<h${lvl}>${inlineFmt(hm[2])}</h${lvl}>`);
+            i++; continue;
+          }
+          if (/^---+$/.test(t)) { out.push('<hr>'); i++; continue; }
+          if (/^[-*]\s/.test(t)) {
+            const items = [];
+            while (i < lines.length && /^[-*]\s/.test(lines[i].trim())) {
+              items.push(`<li>${inlineFmt(lines[i].trim().replace(/^[-*]\s+/, ''))}</li>`);
+              i++;
+            }
+            out.push(`<ul>${items.join('')}</ul>`); continue;
+          }
+          if (/^\d+[.)]\s/.test(t)) {
+            const items = [];
+            while (i < lines.length && /^\d+[.)]\s/.test(lines[i].trim())) {
+              items.push(`<li>${inlineFmt(lines[i].trim().replace(/^\d+[.)]\s+/, ''))}</li>`);
+              i++;
+            }
+            out.push(`<ol>${items.join('')}</ol>`); continue;
+          }
+          if (!t) { i++; continue; }
+          const para = [];
+          while (i < lines.length) {
+            const s = lines[i].trim();
+            if (!s || /^(#{1,4}\s|[-*]\s|\d+[.)]\s|---+)/.test(s)) break;
+            para.push(inlineFmt(s));
+            i++;
+          }
+          if (para.length) out.push(`<p>${para.join('<br>')}</p>`);
+        }
+        return out.join('');
+      }
+
       function renderResults(payload) {
         const full = payload && payload.scraped;
         if (!full) {
@@ -578,27 +684,16 @@
 
         const parts = [];
 
-        // AI card
-        parts.push(`
-          <div class="card ai">
-            <h2>AI Analysis</h2>
-            <div class="analysis">${
-              payload.ai_analysis
-                ? escapeHtml(payload.ai_analysis)
-                : '<span class="empty-note">AI analysis unavailable.</span>'
-            }</div>
-          </div>
-        `);
-
-        // Header card: cover + title + quick stats
-        const paragonUrl = full.url ? `<div class="sub"><a href="${escapeHtml(full.url)}" target="_blank" rel="noopener">Open in Paragon ↗</a></div>` : '';
+        // 1. Header card: cover + address + price (no Paragon link)
         const coverImg = full.cover_photo_url
           ? `<img class="cover" src="${escapeHtml(full.cover_photo_url)}" alt="Cover photo" />`
           : '<div class="cover" aria-hidden="true"></div>';
         const variantNote = full.query_variant
           ? `<div class="sub">Matched with: <em>${escapeHtml(full.query_variant)}</em></div>`
           : '';
-
+        const priceHtml = f['Listing Price']
+          ? `<div class="price-display">${escapeHtml(f['Listing Price'])}</div>`
+          : '';
         parts.push(`
           <div class="card">
             <div class="header-row">
@@ -606,18 +701,30 @@
               <div class="title-block">
                 <h3>${escapeHtml(street || '(no address)')}</h3>
                 <div class="sub">${escapeHtml(cityStateZip)} · MLS# ${escapeHtml(f['MLS #'] || '')} ${statusBadge(f['Status'])}</div>
+                ${priceHtml}
                 ${variantNote}
-                ${paragonUrl}
               </div>
             </div>
           </div>
         `);
 
-        // Stats row
+        // 2. AI Analysis card (markdown rendered, collapsible at 600 chars)
+        const aiText = payload.ai_analysis || '';
+        const aiNeedsToggle = aiText.length > 600;
+        const aiBodyHtml = aiText
+          ? `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>
+             ${aiNeedsToggle ? `<button class="ai-more-btn">View more</button>` : ''}`
+          : `<div class="ai-prose"><span class="empty-note">AI analysis unavailable.</span></div>`;
+        parts.push(`
+          <div class="card ai">
+            <h2>AI Analysis</h2>
+            ${aiBodyHtml}
+          </div>
+        `);
+
+        // 3. Key Stats (price lives in header card now)
         const dom = (full.card && full.card.dom) || '';
         const statList = [
-          { label: 'Price', value: f['Listing Price'] },
-          { label: 'Status', value: f['Status'] },
           { label: 'DOM', value: dom },
           { label: 'Beds', value: f['Bedrooms'] },
           { label: 'Baths', value: f['Bathrooms Full/Half'] || f['Bathrooms'] },
@@ -629,19 +736,15 @@
           <div class="card">
             <h2>Key Stats</h2>
             <div class="stats">
-              ${statList
-                .map(
-                  (s) => `<div class="stat">
-                    <div class="label">${escapeHtml(s.label)}</div>
-                    <div class="value">${escapeHtml(s.value || '—')}</div>
-                  </div>`
-                )
-                .join('')}
+              ${statList.map(s => `<div class="stat">
+                <div class="label">${escapeHtml(s.label)}</div>
+                <div class="value">${escapeHtml(s.value || '—')}</div>
+              </div>`).join('')}
             </div>
           </div>
         `);
 
-        // Showing / access
+        // 4. Showing & Access
         const lockBox = f['Lock Box Provider'];
         const showingInstructions = f['Showing Instructions'];
         const phone = extractPhone([showingInstructions, f['Agent Remarks']]);
@@ -656,17 +759,19 @@
           `);
         }
 
-        // Public remarks
+        // 5. Public Remarks (collapsed toggle, closed by default)
         if (f['Public Remarks']) {
           parts.push(`
             <div class="card">
-              <h2>Public Remarks</h2>
-              <div class="remarks">${escapeHtml(f['Public Remarks'])}</div>
+              <details class="section-toggle">
+                <summary>Public Remarks</summary>
+                <div class="remarks" style="margin-top:8px">${escapeHtml(f['Public Remarks'])}</div>
+              </details>
             </div>
           `);
         }
 
-        // Agent remarks (only when populated)
+        // 6. Agent Remarks
         if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
           parts.push(`
             <div class="card">
@@ -676,70 +781,53 @@
           `);
         }
 
-        // Documents
+        // 7. Documents
         if (docs.length > 0) {
           parts.push(`
             <div class="card docs">
               <h2>Documents (${docs.length})</h2>
-              ${docs
-                .map(
-                  (d) => `<div class="doc">
-                    <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
-                    <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
-                  </div>`
-                )
-                .join('')}
+              ${docs.map(d => `<div class="doc">
+                <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
+                <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
+              </div>`).join('')}
             </div>
           `);
         }
 
-        // Property History
+        // 8. Property History
         if (hist.length > 0) {
           parts.push(`
             <div class="card">
               <h2>Property History</h2>
-              ${hist
-                .map(
-                  (g) => `<div class="history-group">
-                    <div class="mls-label">MLS# ${escapeHtml(g.mls || '')}</div>
-                    <ul class="history-events">
-                      ${(g.events || [])
-                        .map(
-                          (e) => `<li>
-                            <span class="date">${escapeHtml([e.month, e.day].filter(Boolean).join(' '))} ${escapeHtml(e.year || '')}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
-                            <span>
-                              <strong>${escapeHtml(e.event || '')}</strong>${e.price ? ' — ' + escapeHtml(e.price) : ''}
-                            </span>
-                          </li>`
-                        )
-                        .join('')}
-                    </ul>
-                  </div>`
-                )
-                .join('')}
+              ${hist.map(g => `<div class="history-group">
+                <div class="mls-label">MLS# ${escapeHtml(g.mls || '')}</div>
+                <ul class="history-events">
+                  ${(g.events || []).map(e => `<li>
+                    <span class="date">${escapeHtml([e.month, e.day].filter(Boolean).join(' '))} ${escapeHtml(e.year || '')}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
+                    <span><strong>${escapeHtml(e.event || '')}</strong>${e.price ? ' — ' + escapeHtml(e.price) : ''}</span>
+                  </li>`).join('')}
+                </ul>
+              </div>`).join('')}
             </div>
           `);
         }
 
-        // Full fields collapsible
+        // 9. All Fields (collapsible)
         parts.push(`
           <div class="card">
             <details class="all-fields">
               <summary>All Fields (${Object.keys(f).length})</summary>
               <table class="fields-table">
-                ${Object.entries(f)
-                  .map(
-                    ([k, v]) => `<tr>
-                      <td class="label">${escapeHtml(k)}</td>
-                      <td class="value">${escapeHtml(v)}</td>
-                    </tr>`
-                  )
-                  .join('')}
+                ${Object.entries(f).map(([k, v]) => `<tr>
+                  <td class="label">${escapeHtml(k)}</td>
+                  <td class="value">${escapeHtml(v)}</td>
+                </tr>`).join('')}
               </table>
             </details>
           </div>
         `);
 
+        // 10. Performance timings
         const timingsHtml = renderTimings(payload.timings);
         if (timingsHtml) parts.push(timingsHtml);
 
@@ -898,6 +986,15 @@
           return;
         }
         doLookup(q);
+      });
+
+      els.results.addEventListener('click', (e) => {
+        const btn = e.target.closest('.ai-more-btn');
+        if (btn) {
+          const body = btn.previousElementSibling;
+          const collapsed = body.classList.toggle('ai-collapsed');
+          btn.textContent = collapsed ? 'View more' : 'View less';
+        }
       });
 
       els.recent.addEventListener('click', (e) => {

@@ -312,15 +312,16 @@ function normalizeStatus(s) {
 
 /**
  * Pick the right card from a result set.
- *   1. Prefer Status === 'Active'.
+ *   1. Prefer Status === 'Active' or 'New' (both are active listings).
  *   2. Else, prefer the lowest DOM (most recent).
  *   3. Else, first card.
  */
 function selectBestResult(cards) {
   if (!cards || cards.length === 0) return null;
-  const active = cards.filter((c) => c.status && c.status.toLowerCase() === 'active');
+  const ACTIVE_STATUSES = new Set(['active', 'new']);
+  const active = cards.filter((c) => c.status && ACTIVE_STATUSES.has(c.status.toLowerCase()));
   if (active.length > 0) {
-    // Among Actives, prefer lowest DOM.
+    // Among active listings, prefer lowest DOM.
     return active.slice().sort((a, b) => toInt(a.dom) - toInt(b.dom))[0];
   }
   // Fall back to lowest DOM across all (a rough proxy for most recent).
