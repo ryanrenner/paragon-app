@@ -553,7 +553,8 @@ async function scrapeHistory(page) {
         continue;
       }
 
-      // 3. Month/day header. Pattern: <p>Mon<h6>DD</h6></p>.
+      // 3. Month/day header.
+      // Pattern A: <p>Mon<h6>DD</h6></p> — H6 is a DOM child of P (React-created DOM).
       if (el.tagName === 'P' && el.children.length === 1 && el.children[0].tagName === 'H6') {
         const monthText = (el.childNodes[0] && el.childNodes[0].textContent || '').trim();
         const dayText = (el.children[0].textContent || '').trim();
@@ -562,6 +563,22 @@ async function scrapeHistory(page) {
           currentDay = dayText;
         }
         continue;
+      }
+      // Pattern B: <p>Mon</p> followed by sibling <h6>DD</h6> — browser HTML parser
+      // auto-closes the <p> before the block-level <h6>, making them siblings instead.
+      if (el.tagName === 'P' && el.children.length === 0) {
+        const monthText = (el.textContent || '').trim();
+        if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/i.test(monthText)) {
+          const next = el.nextElementSibling;
+          if (next && next.tagName === 'H6' && !next.getAttribute('weight')) {
+            const dayText = (next.textContent || '').trim();
+            if (/^\d{1,2}$/.test(dayText)) {
+              currentMonth = monthText;
+              currentDay = dayText;
+            }
+          }
+          continue;
+        }
       }
 
       // 4. Time — standalone div with HH:MM AM/PM. Inside a .css-27dcjk block.

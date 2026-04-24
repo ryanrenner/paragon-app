@@ -568,6 +568,11 @@
         }
       }
 
+      function histDate(e) {
+        const monthDay = [e.month, e.day].filter(Boolean).join(' ');
+        return (monthDay ? monthDay + ', ' : '') + (e.year || '');
+      }
+
       function statusBadge(status) {
         if (!status) return '';
         const cls = 'status-' + String(status).toLowerCase().replace(/[^a-z]/g, '');
@@ -859,7 +864,7 @@
                 <div class="mls-label">MLS# ${escapeHtml(g.mls || '')}</div>
                 <ul class="history-events">
                   ${(g.events || []).map(e => `<li>
-                    <span class="date">${escapeHtml([e.month, e.day].filter(Boolean).join(' '))} ${escapeHtml(e.year || '')}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
+                    <span class="date">${escapeHtml(histDate(e))}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
                     <span><strong>${escapeHtml(e.event || '')}</strong>${e.price ? ' — ' + escapeHtml(e.price) : ''}</span>
                   </li>`).join('')}
                 </ul>
