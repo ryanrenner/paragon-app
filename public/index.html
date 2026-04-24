@@ -393,11 +393,7 @@
     }
     .ai-more-btn:hover { background: rgba(219,39,119,0.06); }
 
-    /* Run AI Analysis button (bottom of results) */
-    .ai-analyze-wrap {
-      text-align: center;
-      padding: 4px 0 8px;
-    }
+    /* Run AI Analysis button */
     .ai-analyze-btn {
       background: var(--ai-bg);
       border: 2px solid var(--ai-border);
@@ -728,8 +724,8 @@
             tmp.innerHTML = `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>${aiNeedsToggle ? '<button class="ai-more-btn">View more</button>' : ''}`;
             while (tmp.firstChild) aiCard.appendChild(tmp.firstChild);
           }
-          const wrap = document.querySelector('.ai-analyze-wrap');
-          if (wrap) wrap.remove();
+          const analyzeBtn = document.querySelector('.ai-analyze-btn');
+          if (analyzeBtn) analyzeBtn.remove();
         } catch (err) {
           if (btn) { btn.disabled = false; btn.textContent = 'Run AI Analysis'; }
           setStatus('Network error: ' + (err && err.message), { error: true });
@@ -751,6 +747,8 @@
         const cityStateZip = [f['City'], f['State'], f['Zip']].filter(Boolean).join(', ');
 
         const parts = [];
+        const aiText = payload.ai_analysis || '';
+        const lookupId = payload.id || null;
 
         // 1. Header card: cover + address + price (no Paragon link)
         const coverImg = full.cover_photo_url
@@ -776,22 +774,49 @@
           </div>
         `);
 
-        // 2. AI Analysis card (markdown rendered, collapsible at 600 chars)
-        const aiText = payload.ai_analysis || '';
-        const lookupId = payload.id || null;
-        const aiNeedsToggle = aiText.length > 600;
-        const aiBodyHtml = aiText
-          ? `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>
-             ${aiNeedsToggle ? `<button class="ai-more-btn">View more</button>` : ''}`
-          : `<div class="ai-prose"><span class="empty-note">Not yet analyzed.</span></div>`;
-        parts.push(`
-          <div class="card ai">
-            <h2>AI Analysis</h2>
-            ${aiBodyHtml}
-          </div>
-        `);
+        // 2. Documents (with copy-all-links button)
+        if (docs.length > 0) {
+          const docUrls = docs.map(d => d.url).filter(Boolean);
+          parts.push(`
+            <div class="card docs">
+              <div class="docs-header">
+                <h2>Documents (${docs.length})</h2>
+                ${docUrls.length > 0 ? `<button class="copy-links-btn" data-urls="${escapeHtml(docUrls.join('\n'))}">Copy links</button>` : ''}
+              </div>
+              ${docs.map(d => `<div class="doc">
+                <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
+                <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
+              </div>`).join('')}
+            </div>
+          `);
+        }
 
-        // 3. Key Stats (price lives in header card now)
+        // 3. Agent Remarks
+        if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
+          parts.push(`
+            <div class="card">
+              <h2>Agent Remarks</h2>
+              <div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>
+            </div>
+          `);
+        }
+
+        // 4. Showing & Access
+        const lockBox = f['Lock Box Provider'];
+        const showingInstructions = f['Showing Instructions'];
+        const phone = extractPhone([showingInstructions, f['Agent Remarks']]);
+        if (lockBox || showingInstructions || phone) {
+          parts.push(`
+            <div class="card">
+              <h2>Showing & Access</h2>
+              ${lockBox ? `<div><strong>Lock Box:</strong> ${escapeHtml(lockBox)}</div>` : ''}
+              ${phone ? `<div><strong>Call:</strong> <a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}">${escapeHtml(phone)}</a></div>` : ''}
+              ${showingInstructions ? `<div style="margin-top:8px"><strong>Instructions:</strong><div class="remarks">${escapeHtml(showingInstructions)}</div></div>` : ''}
+            </div>
+          `);
+        }
+
+        // 5. Key Stats
         const dom = (full.card && full.card.dom) || '';
         const statList = [
           { label: 'DOM', value: dom },
@@ -813,38 +838,6 @@
           </div>
         `);
 
-        // 4. Showing & Access
-        const lockBox = f['Lock Box Provider'];
-        const showingInstructions = f['Showing Instructions'];
-        const phone = extractPhone([showingInstructions, f['Agent Remarks']]);
-        if (lockBox || showingInstructions || phone) {
-          parts.push(`
-            <div class="card">
-              <h2>Showing & Access</h2>
-              ${lockBox ? `<div><strong>Lock Box:</strong> ${escapeHtml(lockBox)}</div>` : ''}
-              ${phone ? `<div><strong>Call:</strong> <a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}">${escapeHtml(phone)}</a></div>` : ''}
-              ${showingInstructions ? `<div style="margin-top:8px"><strong>Instructions:</strong><div class="remarks">${escapeHtml(showingInstructions)}</div></div>` : ''}
-            </div>
-          `);
-        }
-
-        // 5. Documents (with copy-all-links button)
-        if (docs.length > 0) {
-          const docUrls = docs.map(d => d.url).filter(Boolean);
-          parts.push(`
-            <div class="card docs">
-              <div class="docs-header">
-                <h2>Documents (${docs.length})</h2>
-                ${docUrls.length > 0 ? `<button class="copy-links-btn" data-urls="${escapeHtml(docUrls.join('\n'))}">Copy links</button>` : ''}
-              </div>
-              ${docs.map(d => `<div class="doc">
-                <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
-                <div class="meta">${escapeHtml([d.size, d.date_added, d.visibility].filter(Boolean).join(' · '))}</div>
-              </div>`).join('')}
-            </div>
-          `);
-        }
-
         // 6. Public Remarks (collapsed toggle, closed by default)
         if (f['Public Remarks']) {
           parts.push(`
@@ -857,17 +850,7 @@
           `);
         }
 
-        // 7. Agent Remarks
-        if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
-          parts.push(`
-            <div class="card">
-              <h2>Agent Remarks</h2>
-              <div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>
-            </div>
-          `);
-        }
-
-        // 8. Property History
+        // 7. Property History
         if (hist.length > 0) {
           parts.push(`
             <div class="card">
@@ -885,7 +868,7 @@
           `);
         }
 
-        // 9. All Fields (collapsible)
+        // 8. All Fields (collapsible)
         parts.push(`
           <div class="card">
             <details class="all-fields">
@@ -900,16 +883,21 @@
           </div>
         `);
 
-        // 10. Run AI Analysis button (only when no analysis yet and we have an id)
-        if (!aiText && lookupId) {
-          parts.push(`
-            <div class="ai-analyze-wrap">
-              <button class="ai-analyze-btn" data-id="${escapeHtml(String(lookupId))}">Run AI Analysis</button>
-            </div>
-          `);
-        }
+        // 9. AI Analysis card (button inside when not yet run)
+        const aiNeedsToggle = aiText.length > 600;
+        const aiBodyHtml = aiText
+          ? `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>
+             ${aiNeedsToggle ? `<button class="ai-more-btn">View more</button>` : ''}`
+          : `<div class="ai-prose" style="margin-bottom:10px"><span class="empty-note">Not yet analyzed.</span></div>
+             ${lookupId ? `<button class="ai-analyze-btn" data-id="${escapeHtml(String(lookupId))}">Run AI Analysis</button>` : ''}`;
+        parts.push(`
+          <div class="card ai">
+            <h2>AI Analysis</h2>
+            ${aiBodyHtml}
+          </div>
+        `);
 
-        // 11. Performance timings
+        // 10. Performance timings
         const timingsHtml = renderTimings(payload.timings);
         if (timingsHtml) parts.push(timingsHtml);
 
