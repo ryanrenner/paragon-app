@@ -393,6 +393,25 @@
     }
     .ai-more-btn:hover { background: rgba(219,39,119,0.06); }
 
+    /* Run AI Analysis button (bottom of results) */
+    .ai-analyze-wrap {
+      text-align: center;
+      padding: 4px 0 8px;
+    }
+    .ai-analyze-btn {
+      background: var(--ai-bg);
+      border: 2px solid var(--ai-border);
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 10px 32px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .ai-analyze-btn:hover { background: #fce7f3; border-color: var(--accent); }
+    .ai-analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
     /* Section toggles (e.g. Public Remarks) */
     details.section-toggle summary {
       cursor: pointer;
@@ -580,7 +599,6 @@
           'Logging into Paragon...',
           'Searching for the listing...',
           'Scraping listing details...',
-          'Running AI analysis...',
         ];
         let i = 0;
         setStatus(phases[i], { spinner: true });
@@ -688,6 +706,36 @@
         return out.join('');
       }
 
+      async function runAiAnalysis(id) {
+        const btn = document.querySelector('.ai-analyze-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Analyzing…'; }
+        try {
+          const res = await fetch('/api/history/' + encodeURIComponent(id) + '/analyze', { method: 'POST' });
+          const data = await res.json().catch(() => ({ error: 'Invalid response.' }));
+          if (!res.ok) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Run AI Analysis'; }
+            setStatus(data.error || 'AI analysis failed.', { error: true });
+            return;
+          }
+          const aiText = data.ai_analysis || '';
+          const aiNeedsToggle = aiText.length > 600;
+          const aiCard = document.querySelector('.card.ai');
+          if (aiCard) {
+            const h2 = aiCard.querySelector('h2');
+            aiCard.innerHTML = '';
+            aiCard.appendChild(h2);
+            const tmp = document.createElement('div');
+            tmp.innerHTML = `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>${aiNeedsToggle ? '<button class="ai-more-btn">View more</button>' : ''}`;
+            while (tmp.firstChild) aiCard.appendChild(tmp.firstChild);
+          }
+          const wrap = document.querySelector('.ai-analyze-wrap');
+          if (wrap) wrap.remove();
+        } catch (err) {
+          if (btn) { btn.disabled = false; btn.textContent = 'Run AI Analysis'; }
+          setStatus('Network error: ' + (err && err.message), { error: true });
+        }
+      }
+
       function renderResults(payload) {
         const full = payload && payload.scraped;
         if (!full) {
@@ -730,11 +778,12 @@
 
         // 2. AI Analysis card (markdown rendered, collapsible at 600 chars)
         const aiText = payload.ai_analysis || '';
+        const lookupId = payload.id || null;
         const aiNeedsToggle = aiText.length > 600;
         const aiBodyHtml = aiText
           ? `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>
              ${aiNeedsToggle ? `<button class="ai-more-btn">View more</button>` : ''}`
-          : `<div class="ai-prose"><span class="empty-note">AI analysis unavailable.</span></div>`;
+          : `<div class="ai-prose"><span class="empty-note">Not yet analyzed.</span></div>`;
         parts.push(`
           <div class="card ai">
             <h2>AI Analysis</h2>
@@ -851,7 +900,16 @@
           </div>
         `);
 
-        // 10. Performance timings
+        // 10. Run AI Analysis button (only when no analysis yet and we have an id)
+        if (!aiText && lookupId) {
+          parts.push(`
+            <div class="ai-analyze-wrap">
+              <button class="ai-analyze-btn" data-id="${escapeHtml(String(lookupId))}">Run AI Analysis</button>
+            </div>
+          `);
+        }
+
+        // 11. Performance timings
         const timingsHtml = renderTimings(payload.timings);
         if (timingsHtml) parts.push(timingsHtml);
 
@@ -924,6 +982,7 @@
             document.title = addr + ' · MLS Lookup';
           }
           renderResults({
+            id: row.id,
             scraped: row.full_data_parsed,
             ai_analysis: row.ai_analysis,
             ai_available: !!row.ai_analysis,
@@ -952,9 +1011,7 @@
             return;
           }
           stopPhasedStatus();
-          setStatus(
-            data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).'
-          );
+          setStatus('Scrape complete.');
           if (data.id) {
             const addr = (data.scraped && data.scraped.fields && data.scraped.fields['Address']) || query;
             history.pushState({ historyId: data.id }, addr, '/history/' + data.id);
@@ -984,7 +1041,7 @@
             return;
           }
           stopPhasedStatus();
-          setStatus(data.ai_available ? 'Done.' : 'Scrape complete (AI unavailable).');
+          setStatus('Scrape complete.');
           if (data.id) {
             const addr = (data.scraped && data.scraped.fields && data.scraped.fields['Address']) || '';
             history.pushState({ historyId: data.id }, addr, '/history/' + data.id);
@@ -1018,6 +1075,11 @@
           const body = aiBtn.previousElementSibling;
           const collapsed = body.classList.toggle('ai-collapsed');
           aiBtn.textContent = collapsed ? 'View more' : 'View less';
+        }
+
+        const analyzeBtn = e.target.closest('.ai-analyze-btn');
+        if (analyzeBtn && analyzeBtn.dataset.id) {
+          runAiAnalysis(analyzeBtn.dataset.id);
         }
 
         const copyBtn = e.target.closest('.copy-links-btn');

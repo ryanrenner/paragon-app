@@ -175,21 +175,11 @@ async function runLookup(queryInput, opts = {}) {
     error: null,
   });
 
-  const aiStart = Date.now();
-  let aiResult = null;
-  if (!opts.skipAi) {
-    aiResult = await analyzeListing(scraped);
-    if (aiResult && aiResult.text) {
-      updateAiAnalysis(id, aiResult.text);
-    }
-  }
-  timings.ai_ms = Date.now() - aiStart;
-
   return {
     id,
     scraped,
-    ai_analysis: aiResult ? aiResult.text : null,
-    ai_available: Boolean(aiResult),
+    ai_analysis: null,
+    ai_available: false,
     timings,
   };
 }
@@ -288,6 +278,31 @@ app.post('/api/history/:id/rerun', async (req, res) => {
   } catch (err) {
     const status = err.httpStatus || 500;
     res.status(status).json({ error: err.message, lookup_id: err.lookupId || null });
+  }
+});
+
+app.post('/api/history/:id/analyze', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'Bad id.' });
+    const row = getLookupById(id);
+    if (!row) return res.status(404).json({ error: 'Not found.' });
+    if (!row.full_data) return res.status(422).json({ error: 'No scraped data to analyze.' });
+
+    let scraped;
+    try { scraped = JSON.parse(row.full_data); } catch {
+      return res.status(422).json({ error: 'Scraped data is corrupted.' });
+    }
+
+    const aiResult = await analyzeListing(scraped);
+    if (!aiResult || !aiResult.text) {
+      return res.status(502).json({ error: 'AI analysis failed or is unavailable. Check OPENROUTER_API_KEY.' });
+    }
+
+    updateAiAnalysis(id, aiResult.text);
+    res.json({ id, ai_analysis: aiResult.text });
+  } catch (err) {
+    res.status(500).json({ error: shortError(err) });
   }
 });
 
