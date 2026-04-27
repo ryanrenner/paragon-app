@@ -476,6 +476,12 @@
       color: var(--muted);
       font-size: 12px;
     }
+    .recent-item .item-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
     .recent-item .rerun {
       background: #fff;
       border: 1px solid var(--border);
@@ -487,6 +493,87 @@
       cursor: pointer;
     }
     .recent-item .rerun:hover { background: var(--panel-2); border-color: var(--accent); color: var(--accent); }
+    .recent-item .delete-btn {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 5px 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: border-color 0.12s, color 0.12s, background 0.12s;
+    }
+    .recent-item .delete-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: #fff5f5;
+    }
+
+    .show-more-btn {
+      width: 100%;
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.12s, color 0.12s;
+      margin-top: 2px;
+    }
+    .show-more-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Delete confirmation modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.is-visible { display: flex; }
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      padding: 22px 24px 18px;
+      max-width: 300px;
+      width: 90%;
+    }
+    .modal-msg {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+    .modal-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 18px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .modal-btn {
+      border-radius: 6px;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .modal-btn-cancel { background: #fff; color: var(--ink); }
+    .modal-btn-cancel:hover { background: var(--panel-2); }
+    .modal-btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .modal-btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
 
     .empty-note {
       color: var(--muted);
@@ -635,6 +722,17 @@
     </section>
   </div>
 
+  <div id="deleteModal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <p class="modal-msg">Remove this lookup?</p>
+      <p class="modal-sub">This will permanently delete it from history.</p>
+      <div class="modal-actions">
+        <button id="modalCancel" class="modal-btn modal-btn-cancel">Cancel</button>
+        <button id="modalConfirm" class="modal-btn modal-btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       'use strict';
@@ -650,7 +748,15 @@
         results: $('#results'),
         recent: $('#recentList'),
         clockByline: $('#clockByline'),
+        deleteModal: $('#deleteModal'),
+        modalCancel: $('#modalCancel'),
+        modalConfirm: $('#modalConfirm'),
       };
+
+      const HISTORY_INITIAL_LIMIT = 7;
+      let allHistoryRows = [];
+      let historyShowAll = false;
+      let pendingDeleteId = null;
 
       // ---------- Helpers ----------
 
@@ -1172,24 +1278,31 @@
         return null;
       }
 
-      async function loadHistory() {
+      async function loadHistory({ resetExpand = true } = {}) {
         try {
           const res = await fetch('/api/history');
           if (!res.ok) throw new Error('history ' + res.status);
           const data = await res.json();
-          renderHistory(data.lookups || []);
+          allHistoryRows = data.lookups || [];
+          if (resetExpand) historyShowAll = false;
+          renderHistory(allHistoryRows);
         } catch (err) {
           console.error(err);
           els.recent.innerHTML = '<div class="empty-note">Could not load history.</div>';
         }
       }
 
+      const trashIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
+
       function renderHistory(rows) {
         if (!rows.length) {
           els.recent.innerHTML = '<div class="empty-note">No lookups yet. Try one above.</div>';
           return;
         }
-        els.recent.innerHTML = rows
+        const displayRows = historyShowAll ? rows : rows.slice(0, HISTORY_INITIAL_LIMIT);
+        const hiddenCount = rows.length - displayRows.length;
+
+        const itemsHtml = displayRows
           .map((r) => {
             const when = formatChicago(r.queried_at);
             const addr = r.address || r.query_input || '';
@@ -1212,10 +1325,19 @@
                 <div class="sub">${escapeHtml(when)}${sub ? ' · ' + escapeHtml(sub) : ''}</div>
                 ${noteAreaHtml}
               </div>
-              <button class="rerun" data-id="${escapeHtml(r.id)}" title="Run a fresh scrape">Re-run</button>
+              <div class="item-actions">
+                <button class="rerun" data-id="${escapeHtml(r.id)}" title="Run a fresh scrape">Re-run</button>
+                <button class="delete-btn" data-id="${escapeHtml(r.id)}" title="Delete from history">${trashIcon}</button>
+              </div>
             </div>`;
           })
           .join('');
+
+        const showMoreHtml = hiddenCount > 0
+          ? `<button class="show-more-btn">Show ${hiddenCount} more</button>`
+          : '';
+
+        els.recent.innerHTML = itemsHtml + showMoreHtml;
       }
 
       async function openHistoryItem(id, { pushUrl = true } = {}) {
@@ -1279,6 +1401,34 @@
           setStatus('Network error: ' + (err && err.message), { error: true });
         } finally {
           els.button.disabled = false;
+        }
+      }
+
+      function showDeleteConfirm(id) {
+        pendingDeleteId = id;
+        els.deleteModal.classList.add('is-visible');
+        els.deleteModal.setAttribute('aria-hidden', 'false');
+        els.modalConfirm.focus();
+      }
+
+      function hideDeleteConfirm() {
+        pendingDeleteId = null;
+        els.deleteModal.classList.remove('is-visible');
+        els.deleteModal.setAttribute('aria-hidden', 'true');
+      }
+
+      async function deleteHistoryItem(id) {
+        try {
+          const res = await fetch('/api/history/' + encodeURIComponent(id), { method: 'DELETE' });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            setStatus(data.error || 'Delete failed.', { error: true });
+            return;
+          }
+          allHistoryRows = allHistoryRows.filter(r => String(r.id) !== String(id));
+          renderHistory(allHistoryRows);
+        } catch (err) {
+          setStatus('Network error: ' + (err && err.message), { error: true });
         }
       }
 
@@ -1381,11 +1531,26 @@
       });
 
       els.recent.addEventListener('click', (e) => {
-        const btn = e.target.closest('.rerun');
-        if (btn) {
+        const rerunBtn = e.target.closest('.rerun');
+        if (rerunBtn) {
           e.stopPropagation();
-          const id = btn.dataset.id;
+          const id = rerunBtn.dataset.id;
           if (id) rerunHistory(id);
+          return;
+        }
+
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+          e.stopPropagation();
+          const id = deleteBtn.dataset.id;
+          if (id) showDeleteConfirm(id);
+          return;
+        }
+
+        const showMoreBtn = e.target.closest('.show-more-btn');
+        if (showMoreBtn) {
+          historyShowAll = true;
+          renderHistory(allHistoryRows);
           return;
         }
 
@@ -1421,6 +1586,23 @@
             saveNote(mls, e.target.value, statusEl);
             setTimeout(() => collapseNoteInCard(noteArea), 150);
           }
+        }
+      });
+
+      // ---------- Modal ----------
+
+      els.modalCancel.addEventListener('click', hideDeleteConfirm);
+      els.modalConfirm.addEventListener('click', async () => {
+        const id = pendingDeleteId;
+        hideDeleteConfirm();
+        if (id) await deleteHistoryItem(id);
+      });
+      els.deleteModal.addEventListener('click', (e) => {
+        if (e.target === els.deleteModal) hideDeleteConfirm();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && els.deleteModal.classList.contains('is-visible')) {
+          hideDeleteConfirm();
         }
       });
 

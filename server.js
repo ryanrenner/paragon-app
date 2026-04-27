@@ -9,6 +9,7 @@
  *   GET  /api/history       — last 20 lookups (JSON)
  *   GET  /api/history/:id   — one historical record (JSON)
  *   POST /api/history/:id/rerun — rescrape using the original query (JSON)
+ *   DELETE /api/history/:id   — permanently delete a history record (JSON)
  *   GET  /history/:id   — serves index.html (SPA route for shareable result URLs)
  *   GET  /healthz       — unauthenticated health probe
  *
@@ -31,6 +32,7 @@ const {
   updateAiAnalysis,
   getNote,
   upsertNote,
+  deleteLookup,
 } = require('./db');
 
 const app = express();
@@ -318,6 +320,17 @@ app.post('/api/history/:id/analyze', async (req, res) => {
 
     updateAiAnalysis(id, aiResult.text);
     res.json({ id, ai_analysis: aiResult.text });
+  } catch (err) {
+    res.status(500).json({ error: shortError(err) });
+  }
+});
+
+app.delete('/api/history/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'Bad id.' });
+    deleteLookup(id);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: shortError(err) });
   }

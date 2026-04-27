@@ -161,6 +161,12 @@ function upsertNote(mlsNumber, note) {
     .run(mlsNumber, note, new Date().toISOString());
 }
 
+function deleteLookup(id) {
+  getDb()
+    .prepare(`DELETE FROM lookups WHERE id = ?`)
+    .run(id);
+}
+
 module.exports = {
   getDb,
   insertLookup,
@@ -169,4 +175,5 @@ module.exports = {
   updateAiAnalysis,
   getNote,
   upsertNote,
+  deleteLookup,
 };

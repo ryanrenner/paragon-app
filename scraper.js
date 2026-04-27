@@ -635,7 +635,6 @@ async function scrapeAgentContacts(page) {
     if (expanded !== 'true') {
       await heading.click();
     }
-    // Wait for at least one INFO button to appear, or give up after grace period.
     await Promise.race([
       page.getByRole('button', { name: 'INFO' }).first().waitFor({ state: 'visible', timeout: 6000 }),
       page.waitForTimeout(6000),
@@ -649,33 +648,27 @@ async function scrapeAgentContacts(page) {
 
   const agents = [];
 
+  const seen = new Set();
+
   for (let i = 0; i < total; i++) {
     try {
-      // Re-query each iteration — prior modal interactions can stale references.
       await page.getByRole('button', { name: 'INFO' }).nth(i).click();
-      await page.waitForSelector('[role="dialog"]', { timeout: 6000 });
 
-      const agent = await page.evaluate(() => {
-        const dialog = document.querySelector('[role="dialog"]');
-        if (!dialog) return null;
+      // INFO opens a MUI Drawer (role="dialog"). There are always multiple drawers in
+      // the DOM; wait for the specific one containing "Agent Information" to go visible.
+      const drawer = page.locator('[role="dialog"]').filter({ hasText: 'Agent Information' });
+      await drawer.waitFor({ state: 'visible', timeout: 6000 });
 
-        // Flatten all visible text nodes in document order.
+      const agent = await drawer.evaluate((el) => {
         const texts = [];
-        const walker = document.createTreeWalker(
-          dialog,
-          NodeFilter.SHOW_TEXT,
-          {
-            acceptNode(node) {
-              const t = (node.textContent || '').trim();
-              return t ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-            },
-          }
-        );
-        while (walker.nextNode()) {
-          texts.push(walker.currentNode.textContent.trim());
-        }
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+          acceptNode(node) {
+            const t = (node.textContent || '').trim();
+            return t ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+          },
+        });
+        while (walker.nextNode()) texts.push(walker.currentNode.textContent.trim());
 
-        // Return the first non-empty text that follows an exact label match.
         function getAfter(label) {
           const idx = texts.indexOf(label);
           if (idx === -1) return null;
@@ -687,34 +680,39 @@ async function scrapeAgentContacts(page) {
 
         const firstName = getAfter('First Name');
         const lastName  = getAfter('Last Name');
-        const email     = getAfter('Email Address');
         const brokerage = getAfter('Office');
-        const mobile    = getAfter('M');
+
+        const emailAnchor = el.querySelector('a[href^="mailto:"]');
+        const email = emailAnchor
+          ? (emailAnchor.getAttribute('href').replace(/^mailto:/, '') || emailAnchor.textContent.trim())
+          : (getAfter('Email Address') || null);
+
+        const phoneAnchor = el.querySelector('a[href^="tel:"]');
+        const phone = phoneAnchor
+          ? (phoneAnchor.textContent.trim() || phoneAnchor.getAttribute('href').replace(/^tel:/, ''))
+          : (getAfter('M') || null);
 
         return {
           name:      [firstName, lastName].filter(Boolean).join(' ') || null,
           email:     email && email.includes('@') ? email : null,
-          phone:     mobile || null,
+          phone:     phone || null,
           brokerage: brokerage || null,
         };
       });
 
-      // Close the modal — try Escape first, fall back to clicking the first button
-      // in the dialog header (the × close button).
+      // Close the drawer and wait for it to hide before opening the next.
       await page.keyboard.press('Escape');
-      const closed = await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 3000 })
-        .then(() => true)
-        .catch(() => false);
-      if (!closed) {
-        await page.locator('[role="dialog"]').getByRole('button').first().click().catch(() => {});
-        await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 3000 }).catch(() => {});
-      }
+      await drawer.waitFor({ state: 'hidden', timeout: 2000 }).catch(() => {});
 
-      if (agent && agent.name) agents.push(agent);
+      // Deduplicate — some listings show the same agent across multiple INFO buttons.
+      const key = agent.email || agent.name || '';
+      if ((agent.name || agent.phone) && (!key || !seen.has(key))) {
+        if (key) seen.add(key);
+        agents.push(agent);
+      }
     } catch {
-      // Don't let one agent failure break the rest.
       try { await page.keyboard.press('Escape'); } catch {}
-      await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 2000 }).catch(() => {});
+      await page.waitForTimeout(300);
     }
   }
 
