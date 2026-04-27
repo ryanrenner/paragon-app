@@ -487,6 +487,80 @@
       .cover { width: 100%; height: 180px; }
       .history-events li { grid-template-columns: 90px 1fr; }
     }
+
+    /* Notes */
+    .note-add-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.12s, color 0.12s;
+    }
+    .note-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .note-display {
+      font-size: 15px;
+      white-space: pre-wrap;
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .note-display:hover { background: var(--panel-2); border-color: var(--border); }
+    .note-textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-family: inherit;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .note-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(219,39,119,0.18); }
+    .note-save-status { font-size: 12px; color: var(--ok); margin-top: 4px; min-height: 16px; }
+    .note-area { margin-top: 3px; }
+    .note-snippet {
+      color: var(--muted);
+      font-size: 12px;
+      font-style: italic;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    .note-snippet:hover { color: var(--ink); }
+    .note-add-inline {
+      color: var(--muted);
+      font-size: 12px;
+      font-style: italic;
+      cursor: pointer;
+    }
+    .note-add-inline:hover { color: var(--accent); }
+    .note-textarea-inline {
+      width: 100%;
+      min-height: 56px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 13px;
+      font-family: inherit;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      background: #fff;
+      margin-top: 2px;
+      transition: border-color 0.15s;
+    }
+    .note-textarea-inline:focus { border-color: var(--accent); }
+    .note-save-inline { font-size: 11px; color: var(--ok); min-height: 14px; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -702,6 +776,75 @@
         return out.join('');
       }
 
+      // ---------- Notes ----------
+
+      let noteDebounceTimer = null;
+
+      function clearNoteDebounce() {
+        if (noteDebounceTimer) {
+          clearTimeout(noteDebounceTimer);
+          noteDebounceTimer = null;
+        }
+      }
+
+      async function saveNote(mls, text, statusEl) {
+        if (!mls) return;
+        if (statusEl) statusEl.textContent = 'Saving…';
+        try {
+          const res = await fetch('/api/notes/' + encodeURIComponent(mls), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: text }),
+          });
+          if (!res.ok) {
+            if (statusEl) statusEl.textContent = 'Save failed.';
+            return;
+          }
+          if (statusEl) {
+            statusEl.textContent = 'Saved ✓';
+            setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2000);
+          }
+        } catch {
+          if (statusEl) statusEl.textContent = 'Save failed.';
+        }
+      }
+
+      function scheduleNoteSave(mls, text, statusEl) {
+        clearNoteDebounce();
+        noteDebounceTimer = setTimeout(() => {
+          noteDebounceTimer = null;
+          saveNote(mls, text, statusEl);
+        }, 800);
+      }
+
+      function expandNoteInCard(noteArea) {
+        noteArea.querySelector('.note-snippet').style.display = 'none';
+        noteArea.querySelector('.note-add-inline').style.display = 'none';
+        const ta = noteArea.querySelector('.note-textarea-inline');
+        ta.style.display = 'block';
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      }
+
+      function collapseNoteInCard(noteArea) {
+        if (!noteArea.isConnected) return;
+        const ta = noteArea.querySelector('.note-textarea-inline');
+        const savedText = ta.value;
+        ta.style.display = 'none';
+        noteArea.querySelector('.note-save-inline').textContent = '';
+        const snippet = noteArea.querySelector('.note-snippet');
+        const addInline = noteArea.querySelector('.note-add-inline');
+        if (savedText.trim()) {
+          const trunc = savedText.length > 80 ? savedText.slice(0, 80) + '…' : savedText;
+          snippet.textContent = trunc;
+          snippet.style.display = '';
+          addInline.style.display = 'none';
+        } else {
+          snippet.style.display = 'none';
+          addInline.style.display = '';
+        }
+      }
+
       async function runAiAnalysis(id) {
         const btn = document.querySelector('.ai-analyze-btn');
         if (btn) { btn.disabled = true; btn.textContent = 'Analyzing…'; }
@@ -733,6 +876,7 @@
       }
 
       function renderResults(payload) {
+        clearNoteDebounce();
         const full = payload && payload.scraped;
         if (!full) {
           els.results.classList.remove('is-visible');
@@ -767,6 +911,7 @@
               <div class="title-block">
                 <h3>${escapeHtml(street || '(no address)')}</h3>
                 <div class="sub">${escapeHtml(cityStateZip)} · MLS# ${escapeHtml(f['MLS #'] || '')} ${statusBadge(f['Status'])}</div>
+                ${f['Subdivision'] ? `<div class="sub">Subdivision: ${escapeHtml(f['Subdivision'])}</div>` : ''}
                 ${priceHtml}
                 ${variantNote}
               </div>
@@ -774,7 +919,24 @@
           </div>
         `);
 
-        // 2. Documents (with copy-all-links button)
+        // 2. Notes card
+        const mlsNum = f['MLS #'] || '';
+        if (mlsNum) {
+          const noteText = payload.note || '';
+          parts.push(`
+            <div class="card">
+              <h2>My Notes</h2>
+              ${noteText
+                ? `<div class="note-display">${escapeHtml(noteText)}</div>`
+                : `<button class="note-add-btn">+ Add a note…</button>`
+              }
+              <textarea class="note-textarea" data-mls="${escapeHtml(mlsNum)}" placeholder="Type your notes here…" style="display:none">${escapeHtml(noteText)}</textarea>
+              <div class="note-save-status"></div>
+            </div>
+          `);
+        }
+
+        // 3. Documents (with copy-all-links button)
         if (docs.length > 0) {
           const docUrls = docs.map(d => d.url).filter(Boolean);
           parts.push(`
@@ -791,7 +953,7 @@
           `);
         }
 
-        // 3. Agent Remarks
+        // 4. Agent Remarks
         if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
           parts.push(`
             <div class="card">
@@ -801,7 +963,7 @@
           `);
         }
 
-        // 4. Showing & Access
+        // 5. Showing & Access
         const lockBox = f['Lock Box Provider'];
         const showingInstructions = f['Showing Instructions'];
         const phone = extractPhone([showingInstructions, f['Agent Remarks']]);
@@ -818,13 +980,18 @@
 
         // 5. Key Stats
         const dom = (full.card && full.card.dom) || '';
+        const bedsAbove = f['Bedrooms Above Grade'] != null ? parseInt(f['Bedrooms Above Grade'], 10) : null;
+        const bedsTotal = f['Bedrooms'] != null ? parseInt(f['Bedrooms'], 10) : null;
+        const bedsBelow = (bedsAbove != null && bedsTotal != null) ? String(bedsTotal - bedsAbove) : null;
         const statList = [
           { label: 'DOM', value: dom },
-          { label: 'Beds', value: f['Bedrooms'] },
+          { label: 'Beds Above Grade', value: f['Bedrooms Above Grade'] },
+          { label: 'Beds Below Grade', value: bedsBelow },
           { label: 'Baths', value: f['Bathrooms Full/Half'] || f['Bathrooms'] },
+          { label: 'Above Grade SqFt', value: f['Above Grade SQFT'] },
+          { label: 'Fin. Bsmt SqFt', value: f['Finished Basement'] },
           { label: 'Total SqFt', value: f['Total Finished SqFt'] },
           { label: 'Year Built', value: f['Year Built'] },
-          { label: 'Taxes', value: f['Tax Amount'] },
         ];
         parts.push(`
           <div class="card">
@@ -940,10 +1107,20 @@
               .filter(Boolean)
               .join(' · ');
             const err = r.error ? `<span class="badge status-expired">Error</span> ` : '';
+            const noteText = r.note || '';
+            const noteTrunc = noteText.length > 80 ? noteText.slice(0, 80) + '…' : noteText;
+            const noteAreaHtml = r.mls_number ? `
+              <div class="note-area" data-mls="${escapeHtml(r.mls_number)}">
+                <div class="note-snippet"${noteText ? '' : ' style="display:none"'}>${escapeHtml(noteTrunc)}</div>
+                <div class="note-add-inline"${noteText ? ' style="display:none"' : ''}>+ Add note…</div>
+                <textarea class="note-textarea-inline" style="display:none">${escapeHtml(noteText)}</textarea>
+                <div class="note-save-inline"></div>
+              </div>` : '';
             return `<div class="recent-item" data-id="${escapeHtml(r.id)}">
               <div class="meta">
                 <div class="address">${err}${escapeHtml(addr)}</div>
                 <div class="sub">${escapeHtml(when)}${sub ? ' · ' + escapeHtml(sub) : ''}</div>
+                ${noteAreaHtml}
               </div>
               <button class="rerun" data-id="${escapeHtml(r.id)}" title="Run a fresh scrape">Re-run</button>
             </div>`;
@@ -1085,6 +1262,32 @@
             setTimeout(() => { copyBtn.textContent = 'Copy links'; }, 2000);
           });
         }
+
+        const noteAddBtn = e.target.closest('.note-add-btn');
+        const noteDisplay = e.target.closest('.note-display');
+        if (noteAddBtn || noteDisplay) {
+          if (noteAddBtn) noteAddBtn.style.display = 'none';
+          if (noteDisplay) noteDisplay.style.display = 'none';
+          const ta = els.results.querySelector('.note-textarea');
+          if (ta) { ta.style.display = 'block'; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+        }
+      });
+
+      els.results.addEventListener('input', (e) => {
+        if (e.target.matches('.note-textarea')) {
+          const mls = e.target.dataset.mls;
+          const statusEl = e.target.parentElement.querySelector('.note-save-status');
+          scheduleNoteSave(mls, e.target.value, statusEl);
+        }
+      });
+
+      els.results.addEventListener('focusout', (e) => {
+        if (e.target.matches('.note-textarea')) {
+          clearNoteDebounce();
+          const mls = e.target.dataset.mls;
+          const statusEl = e.target.parentElement.querySelector('.note-save-status');
+          saveNote(mls, e.target.value, statusEl);
+        }
       });
 
       els.recent.addEventListener('click', (e) => {
@@ -1095,9 +1298,39 @@
           if (id) rerunHistory(id);
           return;
         }
+
+        const noteArea = e.target.closest('.note-area');
+        if (noteArea) {
+          const noteTarget = e.target.closest('.note-snippet, .note-add-inline');
+          if (noteTarget) expandNoteInCard(noteArea);
+          return;
+        }
+
         const item = e.target.closest('.recent-item');
         if (item && item.dataset.id) {
           openHistoryItem(item.dataset.id);
+        }
+      });
+
+      els.recent.addEventListener('input', (e) => {
+        if (e.target.matches('.note-textarea-inline')) {
+          const noteArea = e.target.closest('.note-area');
+          const mls = noteArea && noteArea.dataset.mls;
+          const statusEl = noteArea && noteArea.querySelector('.note-save-inline');
+          if (mls) scheduleNoteSave(mls, e.target.value, statusEl);
+        }
+      });
+
+      els.recent.addEventListener('focusout', (e) => {
+        if (e.target.matches('.note-textarea-inline')) {
+          clearNoteDebounce();
+          const noteArea = e.target.closest('.note-area');
+          const mls = noteArea && noteArea.dataset.mls;
+          const statusEl = noteArea && noteArea.querySelector('.note-save-inline');
+          if (mls) {
+            saveNote(mls, e.target.value, statusEl);
+            setTimeout(() => collapseNoteInCard(noteArea), 150);
+          }
         }
       });
 

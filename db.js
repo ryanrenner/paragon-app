@@ -72,6 +72,12 @@ function migrate(conn) {
       ON lookups(queried_at DESC);
     CREATE INDEX IF NOT EXISTS idx_lookups_mls
       ON lookups(mls_number);
+
+    CREATE TABLE IF NOT EXISTS property_notes (
+      mls_number  TEXT PRIMARY KEY,
+      note        TEXT NOT NULL DEFAULT '',
+      updated_at  TEXT NOT NULL
+    );
   `);
 }
 
@@ -114,11 +120,12 @@ function getRecentLookups(limit = 20) {
   const conn = getDb();
   return conn
     .prepare(
-      `SELECT id, queried_at, query_input, query_variant, mls_number,
-              address, status, price, days_on_market, cover_photo_url,
-              error
-       FROM lookups
-       ORDER BY datetime(queried_at) DESC, id DESC
+      `SELECT l.id, l.queried_at, l.query_input, l.query_variant, l.mls_number,
+              l.address, l.status, l.price, l.days_on_market, l.cover_photo_url,
+              l.error, COALESCE(pn.note, '') AS note
+       FROM lookups l
+       LEFT JOIN property_notes pn ON pn.mls_number = l.mls_number
+       ORDER BY datetime(l.queried_at) DESC, l.id DESC
        LIMIT ?`
     )
     .all(limit);
@@ -138,10 +145,28 @@ function updateAiAnalysis(id, text) {
     .run(text ?? null, id);
 }
 
+function getNote(mlsNumber) {
+  return getDb()
+    .prepare(`SELECT note FROM property_notes WHERE mls_number = ?`)
+    .get(mlsNumber);
+}
+
+function upsertNote(mlsNumber, note) {
+  getDb()
+    .prepare(
+      `INSERT INTO property_notes (mls_number, note, updated_at)
+       VALUES (?, ?, ?)
+       ON CONFLICT(mls_number) DO UPDATE SET note = excluded.note, updated_at = excluded.updated_at`
+    )
+    .run(mlsNumber, note, new Date().toISOString());
+}
+
 module.exports = {
   getDb,
   insertLookup,
   getRecentLookups,
   getLookupById,
   updateAiAnalysis,
+  getNote,
+  upsertNote,
 };

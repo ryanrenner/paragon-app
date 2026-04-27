@@ -29,6 +29,8 @@ const {
   getRecentLookups,
   getLookupById,
   updateAiAnalysis,
+  getNote,
+  upsertNote,
 } = require('./db');
 
 const app = express();
@@ -45,6 +47,10 @@ app.get('/healthz', (_req, res) => {
 // HTTP Basic Auth middleware
 // --------------------------------------------------------------------------
 function basicAuth(req, res, next) {
+  if (process.env.APP_AUTH_ENABLED === 'false') {
+    return next();
+  }
+
   const user = process.env.APP_USERNAME;
   const pass = process.env.APP_PASSWORD;
 
@@ -175,12 +181,16 @@ async function runLookup(queryInput, opts = {}) {
     error: null,
   });
 
+  const mlsNum = f['MLS #'] || null;
+  const noteRow = mlsNum ? getNote(mlsNum) : null;
+
   return {
     id,
     scraped,
     ai_analysis: null,
     ai_available: false,
     timings,
+    note: noteRow ? noteRow.note : '',
   };
 }
 
@@ -261,7 +271,8 @@ app.get('/api/history/:id', (req, res) => {
         full = JSON.parse(row.full_data);
       } catch {}
     }
-    res.json({ ...row, full_data_parsed: full });
+    const noteRow = row.mls_number ? getNote(row.mls_number) : null;
+    res.json({ ...row, full_data_parsed: full, note: noteRow ? noteRow.note : '' });
   } catch (err) {
     res.status(500).json({ error: shortError(err) });
   }
@@ -301,6 +312,27 @@ app.post('/api/history/:id/analyze', async (req, res) => {
 
     updateAiAnalysis(id, aiResult.text);
     res.json({ id, ai_analysis: aiResult.text });
+  } catch (err) {
+    res.status(500).json({ error: shortError(err) });
+  }
+});
+
+app.get('/api/notes/:mlsNumber', (req, res) => {
+  try {
+    const mls = req.params.mlsNumber;
+    const row = getNote(mls);
+    res.json({ mls_number: mls, note: row ? row.note : '' });
+  } catch (err) {
+    res.status(500).json({ error: shortError(err) });
+  }
+});
+
+app.put('/api/notes/:mlsNumber', (req, res) => {
+  try {
+    const mls = req.params.mlsNumber;
+    const note = String((req.body && req.body.note) ?? '');
+    upsertNote(mls, note);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: shortError(err) });
   }
