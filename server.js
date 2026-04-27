@@ -249,6 +249,12 @@ app.post('/lookup', async (req, res) => {
   }
 });
 
+app.get('/api/config', (_req, res) => {
+  res.json({
+    sms_signature: process.env.SMS_SIGNATURE || '',
+  });
+});
+
 app.get('/api/history', (_req, res) => {
   try {
     const rows = getRecentLookups(20);

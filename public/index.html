@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>MLS Lookup</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#db2777" />
+
+  <!-- iOS home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MLS Lookup" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
   <style>
     :root {
       --bg: #f7f7f8;
@@ -561,6 +574,32 @@
     }
     .note-textarea-inline:focus { border-color: var(--accent); }
     .note-save-inline { font-size: 11px; color: var(--ok); min-height: 14px; margin-top: 2px; }
+
+    /* Agent contacts */
+    .agent-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+    .agent-contacts { display: flex; flex-direction: column; gap: 10px; }
+    .agent-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 14px;
+    }
+    .agent-name-link {
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .agent-name-link:hover { text-decoration: underline; }
+    .agent-phone-link {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .agent-phone-link:hover { text-decoration: underline; color: var(--accent); }
+    .agent-brokerage { color: var(--muted); }
   </style>
 </head>
 <body>
@@ -684,6 +723,47 @@
         }
       }
 
+      // ---------- App config (SMS signature, etc.) ----------
+
+      let appConfig = {};
+      (async function loadConfig() {
+        try {
+          const res = await fetch('/api/config');
+          if (res.ok) appConfig = await res.json();
+        } catch {}
+      })();
+
+      function buildSmsHref(phone, agentName, streetAddress) {
+        const digits = phone.replace(/[^\d+]/g, '');
+        const sig = appConfig.sms_signature || '';
+        let body = `Hey ${agentName}, I have a question about ${streetAddress}.`;
+        if (sig) body += `\n\n${sig}`;
+        return `sms:${digits}&body=${encodeURIComponent(body)}`;
+      }
+
+      function renderAgentContacts(agents, street) {
+        if (!agents || agents.length === 0) return '';
+        const items = agents.map(a => {
+          const nameHtml = a.name
+            ? a.email
+              ? `<a href="mailto:${escapeHtml(a.email)}" class="agent-name-link">${escapeHtml(a.name)}</a>`
+              : `<span style="font-weight:600">${escapeHtml(a.name)}</span>`
+            : '';
+          const phoneHtml = a.phone
+            ? `<a href="${escapeHtml(buildSmsHref(a.phone, a.name || '', street))}" class="agent-phone-link">${escapeHtml(a.phone)}</a>`
+            : '';
+          const brokerageHtml = a.brokerage
+            ? `<div class="agent-brokerage">${escapeHtml(a.brokerage)}</div>`
+            : '';
+          return `<div class="agent-contact">
+            ${nameHtml ? `<div>${nameHtml}</div>` : ''}
+            ${phoneHtml ? `<div>${phoneHtml}</div>` : ''}
+            ${brokerageHtml}
+          </div>`;
+        }).join('');
+        return `<div class="agent-contacts">${items}</div>`;
+      }
+
       // ---------- Rendering ----------
 
       function fmtMs(ms) {
@@ -703,6 +783,7 @@
           { key: 'scrape_fields_ms',  label: 'Parse fields', cls: '' },
           { key: 'scrape_docs_ms',    label: 'Documents',    cls: '' },
           { key: 'scrape_history_ms', label: 'History',      cls: '' },
+          { key: 'scrape_agents_ms',  label: 'Agent contacts', cls: '' },
           { key: 'ai_ms',         label: 'AI analysis',      cls: 'ai' },
         ].filter(p => timings[p.key] != null);
 
@@ -953,12 +1034,21 @@
           `);
         }
 
-        // 4. Agent Remarks
-        if (f['Agent Remarks'] && String(f['Agent Remarks']).trim()) {
+        // 4. Agent Remarks & Contacts
+        const hasRemarks = f['Agent Remarks'] && String(f['Agent Remarks']).trim();
+        const agents = full.agents || [];
+        if (hasRemarks || agents.length > 0) {
+          const remarksHtml = hasRemarks
+            ? `<div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>`
+            : '';
+          const contactsHtml = renderAgentContacts(agents, street);
+          const divider = hasRemarks && agents.length > 0 ? '<hr class="agent-divider">' : '';
           parts.push(`
             <div class="card">
               <h2>Agent Remarks</h2>
-              <div class="remarks">${escapeHtml(f['Agent Remarks'])}</div>
+              ${remarksHtml}
+              ${divider}
+              ${contactsHtml}
             </div>
           `);
         }
@@ -1365,6 +1455,11 @@
       })();
 
       loadHistory();
+
+      // Register service worker for PWA installability.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      }
     })();
   </script>
 </body>

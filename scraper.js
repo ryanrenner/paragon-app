@@ -17,6 +17,7 @@
  *   - scrapeAllFields(page)              returns the fields dict
  *   - scrapeDocuments(page)              returns the documents array
  *   - scrapeHistory(page)                returns the history array
+ *   - scrapeAgentContacts(page)          returns the agents array
  *   - scrapeCoverPhoto(page, mls)        returns the cover photo URL
  *   - scrapeListing(query, opts)         top-level: does the whole pipeline
  *
@@ -613,7 +614,115 @@ async function scrapeHistory(page) {
 }
 
 // --------------------------------------------------------------------------
-// 9. Cover photo
+// 9. Agent/Office contacts
+// --------------------------------------------------------------------------
+
+/**
+ * Expand the "Agent/Office" accordion and scrape contact details for each
+ * listed agent by opening their INFO modal. Returns an array of:
+ *   { name, email, phone, brokerage }
+ *
+ * Failures for individual agents are silently skipped so a broken modal
+ * never aborts the whole scrape.
+ */
+async function scrapeAgentContacts(page) {
+  // Expand the Agent/Office accordion (same pattern as Documents/History).
+  const heading = page.getByRole('button', { name: /^Agent\/Office\b/i }).first();
+  try {
+    const exists = await heading.count();
+    if (exists === 0) return [];
+    const expanded = await heading.getAttribute('aria-expanded').catch(() => 'false');
+    if (expanded !== 'true') {
+      await heading.click();
+    }
+    // Wait for at least one INFO button to appear, or give up after grace period.
+    await Promise.race([
+      page.getByRole('button', { name: 'INFO' }).first().waitFor({ state: 'visible', timeout: 6000 }),
+      page.waitForTimeout(6000),
+    ]);
+  } catch {
+    return [];
+  }
+
+  const total = await page.getByRole('button', { name: 'INFO' }).count();
+  if (total === 0) return [];
+
+  const agents = [];
+
+  for (let i = 0; i < total; i++) {
+    try {
+      // Re-query each iteration — prior modal interactions can stale references.
+      await page.getByRole('button', { name: 'INFO' }).nth(i).click();
+      await page.waitForSelector('[role="dialog"]', { timeout: 6000 });
+
+      const agent = await page.evaluate(() => {
+        const dialog = document.querySelector('[role="dialog"]');
+        if (!dialog) return null;
+
+        // Flatten all visible text nodes in document order.
+        const texts = [];
+        const walker = document.createTreeWalker(
+          dialog,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode(node) {
+              const t = (node.textContent || '').trim();
+              return t ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            },
+          }
+        );
+        while (walker.nextNode()) {
+          texts.push(walker.currentNode.textContent.trim());
+        }
+
+        // Return the first non-empty text that follows an exact label match.
+        function getAfter(label) {
+          const idx = texts.indexOf(label);
+          if (idx === -1) return null;
+          for (let j = idx + 1; j < texts.length; j++) {
+            if (texts[j]) return texts[j];
+          }
+          return null;
+        }
+
+        const firstName = getAfter('First Name');
+        const lastName  = getAfter('Last Name');
+        const email     = getAfter('Email Address');
+        const brokerage = getAfter('Office');
+        const mobile    = getAfter('M');
+
+        return {
+          name:      [firstName, lastName].filter(Boolean).join(' ') || null,
+          email:     email && email.includes('@') ? email : null,
+          phone:     mobile || null,
+          brokerage: brokerage || null,
+        };
+      });
+
+      // Close the modal — try Escape first, fall back to clicking the first button
+      // in the dialog header (the × close button).
+      await page.keyboard.press('Escape');
+      const closed = await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 3000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!closed) {
+        await page.locator('[role="dialog"]').getByRole('button').first().click().catch(() => {});
+        await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 3000 }).catch(() => {});
+      }
+
+      if (agent && agent.name) agents.push(agent);
+    } catch {
+      // Don't let one agent failure break the rest.
+      try { await page.keyboard.press('Escape'); } catch {}
+      await page.waitForSelector('[role="dialog"]', { state: 'hidden', timeout: 2000 }).catch(() => {});
+    }
+  }
+
+  return agents;
+}
+
+// --------------------------------------------------------------------------
+// 10. Cover photo
 // --------------------------------------------------------------------------
 
 async function scrapeCoverPhoto(page, mls) {
@@ -637,7 +746,7 @@ async function scrapeCoverPhoto(page, mls) {
 }
 
 // --------------------------------------------------------------------------
-// 10. End-to-end scrape
+// 11. End-to-end scrape
 // --------------------------------------------------------------------------
 
 /**
@@ -733,6 +842,10 @@ async function scrapeListing(page, query, timings = {}) {
   const history = await scrapeHistory(page);
   doneHistory();
 
+  const doneAgents = mark('scrape_agents_ms');
+  const agents = await scrapeAgentContacts(page);
+  doneAgents();
+
   const coverPhotoUrl = cardCoverPhoto || (await scrapeCoverPhoto(page, best.mls));
 
   return {
@@ -744,6 +857,7 @@ async function scrapeListing(page, query, timings = {}) {
     fields,
     documents,
     history,
+    agents,
   };
 }
 
@@ -768,6 +882,7 @@ module.exports = {
   scrapeAllFields,
   scrapeDocuments,
   scrapeHistory,
+  scrapeAgentContacts,
   scrapeCoverPhoto,
   // top-level
   scrapeListing,
