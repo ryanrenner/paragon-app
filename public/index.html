@@ -35,9 +35,10 @@
     }
 
     /* ── Initial hidden state for JS-toggled sections ── */
+    /* Use !important so class selectors beat these ID selectors (specificity 1-0-0) */
     #status, #results, #deleteModal { display: none; }
-    .is-visible       { display: block; }
-    #deleteModal.is-visible { display: flex; }
+    .is-visible             { display: block !important; }
+    #deleteModal.is-visible { display: flex !important; }
     .status.is-error  { background: #fef2f2 !important; border-color: #fecaca !important; color: #7f1d1d !important; }
 
     /* ── Spinner ── */
