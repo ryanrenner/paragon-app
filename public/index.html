@@ -9,149 +9,56 @@
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#db2777" />
-
-  <!-- iOS home screen -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MLS Lookup" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-  <style>
-    :root {
-      --bg: #f7f7f8;
-      --panel: #ffffff;
-      --panel-2: #fafafb;
-      --border: #e4e4e7;
-      --ink: #18181b;
-      --muted: #6b7280;
-      --accent: #db2777;
-      --accent-ink: #ffffff;
-      --ok: #059669;
-      --warn: #d97706;
-      --danger: #dc2626;
-      --ai-bg: #fdf2f8;
-      --ai-border: #f9a8d4;
-      --radius: 10px;
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.04);
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 18px 16px 72px; }
-    header.app {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    header.app h1 {
-      font-size: 20px;
-      margin: 0;
-      letter-spacing: -0.01em;
-    }
-    header.app .byline {
-      color: var(--muted);
-      font-size: 13px;
+
+  <!-- Tailwind CSS v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+      --color-bg:         #f7f7f8;
+      --color-panel:      #ffffff;
+      --color-panel-2:    #fafafb;
+      --color-border:     #e4e4e7;
+      --color-ink:        #18181b;
+      --color-muted:      #6b7280;
+      --color-accent:     #db2777;
+      --color-ok:         #059669;
+      --color-warn:       #d97706;
+      --color-danger:     #dc2626;
+      --color-ai-bg:      #fdf2f8;
+      --color-ai-border:  #f9a8d4;
     }
 
-    /* Lookup input */
-    .lookup {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-    }
-    .lookup-row {
-      display: flex;
-      gap: 8px;
-    }
-    .lookup-input {
-      flex: 1;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      font-size: 16px;
-      background: #fff;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      min-width: 0;
-    }
-    .lookup-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.18);
-    }
-    .lookup-button {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border: 0;
-      border-radius: 8px;
-      padding: 0 18px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      min-width: 96px;
-      transition: background-color 0.15s;
-    }
-    .lookup-button:hover { background: #be185d; }
-    .lookup-button:disabled {
-      background: #d4d4d8;
-      cursor: not-allowed;
-    }
-    .lookup-hint {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 8px;
-    }
+    /* ── Initial hidden state for JS-toggled sections ── */
+    #status, #results, #deleteModal { display: none; }
+    .is-visible       { display: block; }
+    #deleteModal.is-visible { display: flex; }
+    .status.is-error  { background: #fef2f2 !important; border-color: #fecaca !important; color: #7f1d1d !important; }
 
-    /* Status */
-    .status {
-      margin-top: 14px;
-      padding: 12px 14px;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--ink);
-      font-size: 14px;
-      display: none;
-    }
-    .status.is-visible { display: block; }
-    .status.is-error { background: #fef2f2; border-color: #fecaca; color: #7f1d1d; }
-    .status .spinner {
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @utility spinner {
       display: inline-block;
-      width: 10px;
-      height: 10px;
-      border: 2px solid var(--muted);
+      width: 10px; height: 10px;
+      border: 2px solid var(--color-muted);
       border-top-color: transparent;
       border-radius: 50%;
       margin-right: 8px;
       vertical-align: -1px;
       animation: spin 0.8s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Results */
-    .results {
-      margin-top: 20px;
-      display: none;
-    }
-    .results.is-visible { display: block; }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    /* ── Card ── */
+    @utility card {
+      background: var(--color-panel);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.04);
       padding: 16px;
       margin-bottom: 14px;
     }
@@ -159,51 +66,32 @@
       font-size: 14px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: var(--muted);
+      color: var(--color-muted);
       margin: 0 0 10px;
       font-weight: 600;
     }
-    .card.ai {
-      background: var(--ai-bg);
-      border-color: var(--ai-border);
-    }
-    .card.ai h2 { color: var(--accent); }
-    .card.ai .analysis {
-      white-space: pre-wrap;
-      font-size: 15px;
-      line-height: 1.55;
-    }
+    .card.ai { background: var(--color-ai-bg); border-color: var(--color-ai-border); }
+    .card.ai h2 { color: var(--color-accent); }
 
-    .header-row {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    .cover {
-      width: 180px;
-      height: 120px;
+    /* ── Header row (cover + title) ── */
+    @utility header-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+    @utility cover {
+      width: 180px; height: 120px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--color-border);
       background: #e5e7eb;
       flex-shrink: 0;
     }
-    .title-block h3 {
-      margin: 0 0 4px;
-      font-size: 18px;
-    }
-    .title-block .sub {
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .title-block .sub a {
-      color: var(--accent);
-      text-decoration: none;
-    }
+    @utility title-block { flex: 1; min-width: 0; }
+    .title-block h3 { margin: 0 0 4px; font-size: 18px; }
+    .title-block .sub { color: var(--color-muted); font-size: 14px; }
+    .title-block .sub a { color: var(--color-accent); text-decoration: none; }
     .title-block .sub a:hover { text-decoration: underline; }
+    @utility price-display { font-size: 22px; font-weight: 700; margin-top: 6px; letter-spacing: -0.01em; }
 
-    .badge {
+    /* ── Badge ── */
+    @utility badge {
       display: inline-block;
       padding: 2px 8px;
       border-radius: 999px;
@@ -214,54 +102,39 @@
       color: #374151;
       border: 1px solid transparent;
     }
-    .badge.status-active { background: #dcfce7; color: #14532d; }
-    .badge.status-new { background: #dbeafe; color: #1e3a8a; }
-    .badge.status-pending { background: #fef3c7; color: #78350f; }
-    .badge.status-sold { background: #f3f4f6; color: #374151; }
-    .badge.status-expired { background: #fee2e2; color: #7f1d1d; }
-    .badge.status-withdrawn { background: #fee2e2; color: #7f1d1d; }
+    .badge.status-active   { background: #dcfce7; color: #14532d; }
+    .badge.status-new      { background: #dbeafe; color: #1e3a8a; }
+    .badge.status-pending  { background: #fef3c7; color: #78350f; }
+    .badge.status-sold     { background: #f3f4f6; color: #374151; }
+    .badge.status-expired  { background: #fee2e2; color: #7f1d1d; }
+    .badge.status-withdrawn{ background: #fee2e2; color: #7f1d1d; }
 
-    .stats {
+    /* ── Stats grid ── */
+    @utility stats {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
       gap: 8px;
     }
-    .stat {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
+    @utility stat {
+      background: var(--color-panel-2);
+      border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 8px 10px;
     }
-    .stat .label {
-      font-size: 11px;
-      text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-    .stat .value {
-      font-size: 16px;
-      font-weight: 600;
-      margin-top: 2px;
-      word-wrap: break-word;
-    }
+    .stat .label { font-size: 11px; text-transform: uppercase; color: var(--color-muted); letter-spacing: 0.04em; }
+    .stat .value { font-size: 16px; font-weight: 600; margin-top: 2px; word-wrap: break-word; }
 
-    .remarks {
-      white-space: pre-wrap;
-      font-size: 15px;
-    }
+    /* ── Remarks / prose ── */
+    @utility remarks { white-space: pre-wrap; font-size: 15px; }
+    @utility empty-note { color: var(--color-muted); font-size: 14px; font-style: italic; }
 
-    /* Documents */
-    .docs-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 4px;
-    }
+    /* ── Documents ── */
+    @utility docs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
     .docs-header h2 { margin: 0; }
-    .copy-links-btn {
+    @utility copy-links-btn {
       background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
+      border: 1px solid var(--color-border);
+      color: var(--color-muted);
       border-radius: 6px;
       padding: 3px 10px;
       font-size: 12px;
@@ -269,438 +142,215 @@
       cursor: pointer;
       transition: border-color 0.12s, color 0.12s;
     }
-    .copy-links-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .copy-links-btn.copied { border-color: var(--ok); color: var(--ok); }
-    .docs .doc {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 0;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
+    .copy-links-btn:hover  { border-color: var(--color-accent); color: var(--color-accent); }
+    .copy-links-btn.copied { border-color: var(--color-ok);     color: var(--color-ok); }
+    .docs .doc { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--color-border); flex-wrap: wrap; }
     .docs .doc:first-child { border-top: 0; }
-    .docs .doc .name a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
+    .docs .doc .name a { color: var(--color-accent); text-decoration: none; font-weight: 600; }
     .docs .doc .name a:hover { text-decoration: underline; }
-    .docs .doc .meta {
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .docs .doc .meta { color: var(--color-muted); font-size: 13px; }
 
-    /* History */
-    .history-group { border-top: 1px solid var(--border); padding: 10px 0; }
+    /* ── Agent contacts ── */
+    @utility agent-divider  { border: none; border-top: 1px solid var(--color-border); margin: 12px 0; }
+    @utility agent-contacts { display: flex; flex-direction: column; gap: 10px; }
+    @utility agent-contact  { display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+    @utility agent-name-link  { font-weight: 600; color: var(--color-accent); text-decoration: none; }
+    .agent-name-link:hover    { text-decoration: underline; }
+    @utility agent-phone-link { color: var(--color-ink); text-decoration: none; }
+    .agent-phone-link:hover   { text-decoration: underline; color: var(--color-accent); }
+    @utility agent-brokerage  { color: var(--color-muted); }
+
+    /* ── Property history ── */
+    @utility history-group { border-top: 1px solid var(--color-border); padding: 10px 0; }
     .history-group:first-child { border-top: 0; }
     .history-group .mls-label { font-weight: 600; margin-bottom: 6px; }
-    .history-events { list-style: none; margin: 0; padding: 0; }
+    @utility history-events { list-style: none; margin: 0; padding: 0; }
     .history-events li {
       display: grid;
       grid-template-columns: 110px 1fr;
       gap: 10px;
       padding: 4px 0;
       font-size: 14px;
-      border-top: 1px dashed var(--border);
+      border-top: 1px dashed var(--color-border);
     }
     .history-events li:first-child { border-top: 0; }
-    .history-events .date { color: var(--muted); }
+    .history-events .date { color: var(--color-muted); }
 
-    /* Performance timings card */
-    details.timings-details summary {
-      cursor: pointer;
-      list-style: none;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 4px 0;
+    /* ── Performance timings ── */
+    .timings-details summary {
+      cursor: pointer; list-style: none;
+      color: var(--color-muted); font-size: 13px; font-weight: 500; padding: 4px 0;
     }
-    details.timings-details summary::-webkit-details-marker { display: none; }
-    details.timings-details summary::before { content: "▸ "; }
-    details.timings-details[open] summary::before { content: "▾ "; }
-    .timing-rows { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
-    .timing-row { display: grid; grid-template-columns: 160px 1fr 60px; gap: 8px; align-items: center; font-size: 13px; }
-    .timing-row .t-label { color: var(--muted); white-space: nowrap; }
-    .timing-bar-wrap { background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; }
-    .timing-bar { height: 100%; border-radius: 4px; background: var(--accent); opacity: 0.65; transition: width 0.3s; }
-    .timing-bar.session { background: #7c3aed; }
-    .timing-bar.search { background: #0891b2; }
-    .timing-bar.open { background: #059669; }
-    .timing-bar.ai { background: #d97706; }
-    .timing-row .t-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
-    .timing-total { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: right; }
+    .timings-details summary::before       { content: "▸ "; }
+    .timings-details[open] summary::before { content: "▾ "; }
+    @utility timing-rows { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+    @utility timing-row  { display: grid; grid-template-columns: 160px 1fr 60px; gap: 8px; align-items: center; font-size: 13px; }
+    @utility t-label     { color: var(--color-muted); white-space: nowrap; }
+    @utility timing-bar-wrap { background: var(--color-bg); border-radius: 4px; height: 8px; overflow: hidden; }
+    @utility timing-bar  { height: 100%; border-radius: 4px; background: var(--color-accent); opacity: 0.65; transition: width 0.3s; }
+    .timing-bar.session  { background: #7c3aed; }
+    .timing-bar.search   { background: #0891b2; }
+    .timing-bar.open     { background: #059669; }
+    .timing-bar.ai       { background: #d97706; }
+    @utility t-val       { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-ink); }
+    @utility timing-total{ margin-top: 10px; font-size: 13px; color: var(--color-muted); text-align: right; }
 
-    /* Collapsible */
-    details.all-fields summary {
-      cursor: pointer;
-      list-style: none;
-      color: var(--accent);
-      font-weight: 600;
-      padding: 6px 0;
+    /* ── Collapsible: all fields ── */
+    .all-fields summary {
+      cursor: pointer; list-style: none;
+      color: var(--color-accent); font-weight: 600; padding: 6px 0;
     }
-    details.all-fields summary::-webkit-details-marker { display: none; }
-    details.all-fields summary::before {
-      content: "▸ ";
-    }
-    details.all-fields[open] summary::before {
-      content: "▾ ";
-    }
-    .fields-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 14px;
-    }
-    .fields-table td {
-      padding: 5px 8px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-    .fields-table td.label {
-      color: var(--muted);
-      width: 46%;
-      font-weight: 500;
-    }
-    .fields-table td.value { word-break: break-word; }
+    .all-fields summary::before       { content: "▸ "; }
+    .all-fields[open] summary::before { content: "▾ "; }
+    @utility fields-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+    .fields-table td          { padding: 5px 8px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .fields-table td.label    { color: var(--color-muted); width: 46%; font-weight: 500; }
+    .fields-table td.value    { word-break: break-word; }
 
-    /* Price in header card */
-    .price-display {
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 6px;
-      letter-spacing: -0.01em;
+    /* ── Collapsible: section toggle (Public Remarks, etc.) ── */
+    .section-toggle summary {
+      cursor: pointer; list-style: none;
+      color: var(--color-accent); font-weight: 600;
+      font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 0;
     }
+    .section-toggle summary::before       { content: "▸ "; }
+    .section-toggle[open] summary::before { content: "▾ "; }
 
-    /* AI analysis prose rendering */
-    .ai-prose { font-size: 15px; line-height: 1.6; }
-    .ai-prose h3, .ai-prose h4 { font-size: 1em; font-weight: 700; margin: 0.8em 0 0.2em; color: var(--ink); }
-    .ai-prose p { margin: 0.4em 0; }
+    /* ── AI analysis ── */
+    @utility ai-prose { font-size: 15px; line-height: 1.6; }
+    .ai-prose h3, .ai-prose h4 { font-size: 1em; font-weight: 700; margin: 0.8em 0 0.2em; color: var(--color-ink); }
+    .ai-prose p  { margin: 0.4em 0; }
     .ai-prose ul, .ai-prose ol { margin: 0.4em 0; padding-left: 20px; }
     .ai-prose li { margin: 0.15em 0; }
-    .ai-prose hr { border: none; border-top: 1px solid var(--ai-border); margin: 8px 0; }
-    .ai-body.ai-collapsed {
-      max-height: 200px;
-      overflow: hidden;
-      position: relative;
-    }
+    .ai-prose hr { border: none; border-top: 1px solid var(--color-ai-border); margin: 8px 0; }
+    .ai-body.ai-collapsed { max-height: 200px; overflow: hidden; position: relative; }
     .ai-body.ai-collapsed::after {
       content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
+      position: absolute; bottom: 0; left: 0; right: 0;
       height: 50px;
-      background: linear-gradient(transparent, var(--ai-bg));
+      background: linear-gradient(transparent, var(--color-ai-bg));
       pointer-events: none;
     }
-    .ai-more-btn {
-      display: block;
-      background: none;
-      border: 1px solid var(--ai-border);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 8px;
+    @utility ai-more-btn {
+      display: block; background: none;
+      border: 1px solid var(--color-ai-border);
+      color: var(--color-accent);
+      border-radius: 6px; padding: 4px 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
     }
     .ai-more-btn:hover { background: rgba(219,39,119,0.06); }
-
-    /* Run AI Analysis button */
-    .ai-analyze-btn {
-      background: var(--ai-bg);
-      border: 2px solid var(--ai-border);
-      color: var(--accent);
-      border-radius: 8px;
-      padding: 10px 32px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
+    @utility ai-analyze-btn {
+      background: var(--color-ai-bg);
+      border: 2px solid var(--color-ai-border);
+      color: var(--color-accent);
+      border-radius: 8px; padding: 10px 32px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
       transition: background 0.12s, border-color 0.12s;
     }
-    .ai-analyze-btn:hover { background: #fce7f3; border-color: var(--accent); }
+    .ai-analyze-btn:hover    { background: #fce7f3; border-color: var(--color-accent); }
     .ai-analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* Section toggles (e.g. Public Remarks) */
-    details.section-toggle summary {
-      cursor: pointer;
-      list-style: none;
-      color: var(--accent);
-      font-weight: 600;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 4px 0;
-    }
-    details.section-toggle summary::-webkit-details-marker { display: none; }
-    details.section-toggle summary::before { content: "▸ "; }
-    details.section-toggle[open] summary::before { content: "▾ "; }
-
-    /* History list (bottom) */
-    .recent {
-      margin-top: 24px;
-    }
-    .recent h2 {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      margin: 0 0 10px;
-    }
-    .recent-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .recent-item {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      cursor: pointer;
-      transition: border-color 0.12s;
+    /* ── Recent history list ── */
+    @utility recent-item {
+      background: var(--color-panel);
+      border: 1px solid var(--color-border);
+      border-radius: 8px; padding: 10px 12px;
+      display: flex; gap: 10px; align-items: center;
+      cursor: pointer; transition: border-color 0.12s;
     }
     .recent-item:hover { border-color: #9ca3af; }
-    .recent-item .meta { flex: 1; min-width: 0; }
-    .recent-item .address {
-      font-weight: 600;
-      font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .recent-item .sub {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .recent-item .item-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    .recent-item .rerun {
+    .recent-item .meta    { flex: 1; min-width: 0; }
+    .recent-item .address { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .recent-item .sub     { color: var(--color-muted); font-size: 12px; }
+    @utility item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    @utility rerun {
       background: #fff;
-      border: 1px solid var(--border);
-      color: var(--ink);
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      border: 1px solid var(--color-border);
+      color: var(--color-ink);
+      border-radius: 6px; padding: 5px 10px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
     }
-    .recent-item .rerun:hover { background: var(--panel-2); border-color: var(--accent); color: var(--accent); }
-    .recent-item .delete-btn {
+    .rerun:hover { background: var(--color-panel-2); border-color: var(--color-accent); color: var(--color-accent); }
+    @utility delete-btn {
       background: none;
       border: 1px solid transparent;
-      color: var(--muted);
-      border-radius: 6px;
-      padding: 5px 7px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+      color: var(--color-muted);
+      border-radius: 6px; padding: 5px 7px;
+      cursor: pointer; display: flex; align-items: center;
       transition: border-color 0.12s, color 0.12s, background 0.12s;
     }
-    .recent-item .delete-btn:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: #fff5f5;
+    .delete-btn:hover { border-color: var(--color-danger); color: var(--color-danger); background: #fff5f5; }
+    @utility show-more-btn {
+      width: 100%; background: none;
+      border: 1px dashed var(--color-border);
+      color: var(--color-muted);
+      border-radius: 8px; padding: 9px 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      text-align: center; transition: border-color 0.12s, color 0.12s; margin-top: 2px;
     }
+    .show-more-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
-    .show-more-btn {
-      width: 100%;
-      background: none;
-      border: 1px dashed var(--border);
-      color: var(--muted);
-      border-radius: 8px;
-      padding: 9px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
+    /* ── Notes ── */
+    @utility note-add-btn {
+      width: 100%; text-align: left; background: none;
+      border: 1px dashed var(--color-border);
+      color: var(--color-muted);
+      border-radius: 8px; padding: 9px 12px;
+      font-size: 14px; cursor: pointer;
       transition: border-color 0.12s, color 0.12s;
-      margin-top: 2px;
     }
-    .show-more-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .note-add-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    @utility note-display {
+      font-size: 15px; white-space: pre-wrap; cursor: pointer;
+      padding: 6px 8px; border-radius: 6px; border: 1px solid transparent;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .note-display:hover { background: var(--color-panel-2); border-color: var(--color-border); }
+    @utility note-textarea {
+      width: 100%; min-height: 80px;
+      border: 1px solid var(--color-border); border-radius: 8px;
+      padding: 10px 12px; font-size: 15px; font-family: inherit;
+      line-height: 1.5; resize: vertical; outline: none; background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .note-textarea:focus { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(219,39,119,0.18); }
+    @utility note-save-status { font-size: 12px; color: var(--color-ok); margin-top: 4px; min-height: 16px; }
+    @utility note-area        { margin-top: 3px; }
+    @utility note-snippet     { color: var(--color-muted); font-size: 12px; font-style: italic; cursor: pointer; line-height: 1.4; }
+    .note-snippet:hover       { color: var(--color-ink); }
+    @utility note-add-inline  { color: var(--color-muted); font-size: 12px; font-style: italic; cursor: pointer; }
+    .note-add-inline:hover    { color: var(--color-accent); }
+    @utility note-textarea-inline {
+      width: 100%; min-height: 56px;
+      border: 1px solid var(--color-border); border-radius: 6px;
+      padding: 6px 8px; font-size: 13px; font-family: inherit;
+      line-height: 1.5; resize: vertical; outline: none; background: #fff;
+      margin-top: 2px; transition: border-color 0.15s;
+    }
+    .note-textarea-inline:focus { border-color: var(--color-accent); }
+    @utility note-save-inline { font-size: 11px; color: var(--color-ok); min-height: 14px; margin-top: 2px; }
 
-    /* Delete confirmation modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.is-visible { display: flex; }
-    .modal-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-      padding: 22px 24px 18px;
-      max-width: 300px;
-      width: 90%;
-    }
-    .modal-msg {
-      font-size: 15px;
-      font-weight: 600;
-      margin: 0 0 4px;
-    }
-    .modal-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin: 0 0 18px;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-    .modal-btn {
-      border-radius: 6px;
-      padding: 7px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: background 0.12s, border-color 0.12s;
-    }
-    .modal-btn-cancel { background: #fff; color: var(--ink); }
-    .modal-btn-cancel:hover { background: var(--panel-2); }
-    .modal-btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-    .modal-btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
-
-    .empty-note {
-      color: var(--muted);
-      font-size: 14px;
-      font-style: italic;
-    }
-
+    /* ── Responsive ── */
+    details summary::-webkit-details-marker { display: none; }
     @media (max-width: 540px) {
-      .lookup-row { flex-direction: column; }
-      .lookup-button { padding: 12px; }
       .cover { width: 100%; height: 180px; }
       .history-events li { grid-template-columns: 90px 1fr; }
     }
-
-    /* Notes */
-    .note-add-btn {
-      width: 100%;
-      text-align: left;
-      background: none;
-      border: 1px dashed var(--border);
-      color: var(--muted);
-      border-radius: 8px;
-      padding: 9px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: border-color 0.12s, color 0.12s;
-    }
-    .note-add-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .note-display {
-      font-size: 15px;
-      white-space: pre-wrap;
-      cursor: pointer;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid transparent;
-      transition: border-color 0.12s, background 0.12s;
-    }
-    .note-display:hover { background: var(--panel-2); border-color: var(--border); }
-    .note-textarea {
-      width: 100%;
-      min-height: 80px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 15px;
-      font-family: inherit;
-      line-height: 1.5;
-      resize: vertical;
-      outline: none;
-      background: #fff;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .note-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(219,39,119,0.18); }
-    .note-save-status { font-size: 12px; color: var(--ok); margin-top: 4px; min-height: 16px; }
-    .note-area { margin-top: 3px; }
-    .note-snippet {
-      color: var(--muted);
-      font-size: 12px;
-      font-style: italic;
-      cursor: pointer;
-      line-height: 1.4;
-    }
-    .note-snippet:hover { color: var(--ink); }
-    .note-add-inline {
-      color: var(--muted);
-      font-size: 12px;
-      font-style: italic;
-      cursor: pointer;
-    }
-    .note-add-inline:hover { color: var(--accent); }
-    .note-textarea-inline {
-      width: 100%;
-      min-height: 56px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 8px;
-      font-size: 13px;
-      font-family: inherit;
-      line-height: 1.5;
-      resize: vertical;
-      outline: none;
-      background: #fff;
-      margin-top: 2px;
-      transition: border-color 0.15s;
-    }
-    .note-textarea-inline:focus { border-color: var(--accent); }
-    .note-save-inline { font-size: 11px; color: var(--ok); min-height: 14px; margin-top: 2px; }
-
-    /* Agent contacts */
-    .agent-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 12px 0;
-    }
-    .agent-contacts { display: flex; flex-direction: column; gap: 10px; }
-    .agent-contact {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 14px;
-    }
-    .agent-name-link {
-      font-weight: 600;
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .agent-name-link:hover { text-decoration: underline; }
-    .agent-phone-link {
-      color: var(--ink);
-      text-decoration: none;
-    }
-    .agent-phone-link:hover { text-decoration: underline; color: var(--accent); }
-    .agent-brokerage { color: var(--muted); }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <header class="app">
-      <h1>MLS Lookup</h1>
-      <span class="byline" id="clockByline"></span>
+<body class="bg-bg text-ink font-sans text-base leading-[1.5] m-0 p-0">
+  <div class="max-w-[880px] mx-auto px-4 pt-[18px] pb-[72px]">
+
+    <header class="flex items-baseline justify-between gap-3 mb-[18px]">
+      <h1 class="text-xl m-0 font-semibold tracking-[-0.01em]">MLS Lookup</h1>
+      <span class="text-muted text-[13px]" id="clockByline"></span>
     </header>
 
-    <section class="lookup" aria-label="Lookup a listing">
-      <form id="lookupForm" class="lookup-row" autocomplete="off">
+    <section class="bg-panel border border-border rounded-[10px] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.04)] p-[14px]" aria-label="Lookup a listing">
+      <form id="lookupForm" class="flex flex-col gap-2 sm:flex-row" autocomplete="off">
         <input
           id="lookupInput"
-          class="lookup-input"
+          class="flex-1 border border-border rounded-lg px-[14px] py-3 text-base bg-white outline-none transition-[border-color,box-shadow] duration-150 min-w-0 focus:border-accent focus:shadow-[0_0_0_3px_rgba(219,39,119,0.18)]"
           type="text"
           placeholder="Enter MLS # or address"
           autocapitalize="off"
@@ -708,27 +358,31 @@
           spellcheck="false"
           inputmode="text"
         />
-        <button id="lookupButton" class="lookup-button" type="submit">Look Up</button>
+        <button
+          id="lookupButton"
+          class="bg-accent text-white border-0 rounded-lg px-[18px] max-sm:py-3 text-[15px] font-semibold cursor-pointer min-w-24 transition-colors duration-150 hover:bg-[#be185d] disabled:bg-zinc-300 disabled:cursor-not-allowed"
+          type="submit"
+        >Look Up</button>
       </form>
-      <div class="lookup-hint">Try <code>22610267</code> or <code>3503 S 152nd St</code></div>
-      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div class="text-[13px] text-muted mt-2">Try <code>22610267</code> or <code>3503 S 152nd St</code></div>
+      <div id="status" class="status mt-[14px] px-[14px] py-3 bg-panel-2 border border-border rounded-lg text-ink text-sm" role="status" aria-live="polite"></div>
     </section>
 
-    <section id="results" class="results" aria-live="polite"></section>
+    <section id="results" class="mt-5" aria-live="polite"></section>
 
-    <section class="recent" aria-label="Recent lookups">
-      <h2>Recent Lookups</h2>
-      <div id="recentList" class="recent-list"></div>
+    <section class="mt-6" aria-label="Recent lookups">
+      <h2 class="text-[13px] uppercase tracking-[0.04em] text-muted font-semibold m-0 mb-[10px]">Recent Lookups</h2>
+      <div id="recentList" class="flex flex-col gap-[6px]"></div>
     </section>
   </div>
 
-  <div id="deleteModal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-box">
-      <p class="modal-msg">Remove this lookup?</p>
-      <p class="modal-sub">This will permanently delete it from history.</p>
-      <div class="modal-actions">
-        <button id="modalCancel" class="modal-btn modal-btn-cancel">Cancel</button>
-        <button id="modalConfirm" class="modal-btn modal-btn-danger">Delete</button>
+  <div id="deleteModal" class="fixed inset-0 bg-black/35 z-[200] items-center justify-center" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-panel border border-border rounded-[10px] shadow-[0_8px_32px_rgba(0,0,0,0.18)] px-6 pt-[22px] pb-[18px] max-w-[300px] w-[90%]">
+      <p class="text-[15px] font-semibold m-0 mb-1">Remove this lookup?</p>
+      <p class="text-[13px] text-muted m-0 mb-[18px]">This will permanently delete it from history.</p>
+      <div class="flex gap-2 justify-end">
+        <button id="modalCancel"  class="rounded-md px-[18px] py-[7px] text-[13px] font-semibold cursor-pointer border border-border bg-white text-ink hover:bg-panel-2 transition-colors duration-150">Cancel</button>
+        <button id="modalConfirm" class="rounded-md px-[18px] py-[7px] text-[13px] font-semibold cursor-pointer border border-danger bg-danger text-white hover:bg-red-700 hover:border-red-700 transition-colors duration-150">Delete</button>
       </div>
     </div>
   </div>
@@ -853,7 +507,7 @@
           const nameHtml = a.name
             ? a.email
               ? `<a href="mailto:${escapeHtml(a.email)}" class="agent-name-link">${escapeHtml(a.name)}</a>`
-              : `<span style="font-weight:600">${escapeHtml(a.name)}</span>`
+              : `<span class="font-semibold">${escapeHtml(a.name)}</span>`
             : '';
           const phoneHtml = a.phone
             ? `<a href="${escapeHtml(buildSmsHref(a.phone, a.name || '', street))}" class="agent-phone-link">${escapeHtml(a.phone)}</a>`
@@ -881,16 +535,16 @@
       function renderTimings(timings) {
         if (!timings || !Object.keys(timings).length) return '';
         const phases = [
-          { key: 'queue_wait_ms', label: 'Queue wait',       cls: '' },
-          { key: 'session_ms',    label: 'Session / Login',  cls: 'session' },
-          { key: 'search_ms',     label: 'Search',           cls: 'search' },
-          { key: 'open_listing_ms',   label: 'Open listing', cls: 'open' },
-          { key: 'expand_fields_ms',  label: 'Expand fields',cls: '' },
-          { key: 'scrape_fields_ms',  label: 'Parse fields', cls: '' },
-          { key: 'scrape_docs_ms',    label: 'Documents',    cls: '' },
-          { key: 'scrape_history_ms', label: 'History',      cls: '' },
-          { key: 'scrape_agents_ms',  label: 'Agent contacts', cls: '' },
-          { key: 'ai_ms',         label: 'AI analysis',      cls: 'ai' },
+          { key: 'queue_wait_ms',     label: 'Queue wait',       cls: '' },
+          { key: 'session_ms',        label: 'Session / Login',  cls: 'session' },
+          { key: 'search_ms',         label: 'Search',           cls: 'search' },
+          { key: 'open_listing_ms',   label: 'Open listing',     cls: 'open' },
+          { key: 'expand_fields_ms',  label: 'Expand fields',    cls: '' },
+          { key: 'scrape_fields_ms',  label: 'Parse fields',     cls: '' },
+          { key: 'scrape_docs_ms',    label: 'Documents',        cls: '' },
+          { key: 'scrape_history_ms', label: 'History',          cls: '' },
+          { key: 'scrape_agents_ms',  label: 'Agent contacts',   cls: '' },
+          { key: 'ai_ms',             label: 'AI analysis',      cls: 'ai' },
         ].filter(p => timings[p.key] != null);
 
         const total = phases.reduce((s, p) => s + (timings[p.key] || 0), 0);
@@ -1081,7 +735,7 @@
         const aiText = payload.ai_analysis || '';
         const lookupId = payload.id || null;
 
-        // 1. Header card: cover + address + price (no Paragon link)
+        // 1. Header card: cover + address + price
         const coverImg = full.cover_photo_url
           ? `<img class="cover" src="${escapeHtml(full.cover_photo_url)}" alt="Cover photo" />`
           : '<div class="cover" aria-hidden="true"></div>';
@@ -1169,25 +823,25 @@
               <h2>Showing & Access</h2>
               ${lockBox ? `<div><strong>Lock Box:</strong> ${escapeHtml(lockBox)}</div>` : ''}
               ${phone ? `<div><strong>Call:</strong> <a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}">${escapeHtml(phone)}</a></div>` : ''}
-              ${showingInstructions ? `<div style="margin-top:8px"><strong>Instructions:</strong><div class="remarks">${escapeHtml(showingInstructions)}</div></div>` : ''}
+              ${showingInstructions ? `<div class="mt-2"><strong>Instructions:</strong><div class="remarks">${escapeHtml(showingInstructions)}</div></div>` : ''}
             </div>
           `);
         }
 
-        // 5. Key Stats
+        // 6. Key Stats
         const dom = (full.card && full.card.dom) || '';
         const bedsAbove = f['Bedrooms Above Grade'] != null ? parseInt(f['Bedrooms Above Grade'], 10) : null;
         const bedsTotal = f['Bedrooms'] != null ? parseInt(f['Bedrooms'], 10) : null;
         const bedsBelow = (bedsAbove != null && bedsTotal != null) ? String(bedsTotal - bedsAbove) : null;
         const statList = [
-          { label: 'DOM', value: dom },
+          { label: 'DOM',              value: dom },
           { label: 'Beds Above Grade', value: f['Bedrooms Above Grade'] },
           { label: 'Beds Below Grade', value: bedsBelow },
-          { label: 'Baths', value: f['Bathrooms Full/Half'] || f['Bathrooms'] },
+          { label: 'Baths',            value: f['Bathrooms Full/Half'] || f['Bathrooms'] },
           { label: 'Above Grade SqFt', value: f['Above Grade SQFT'] },
-          { label: 'Fin. Bsmt SqFt', value: f['Finished Basement'] },
-          { label: 'Total SqFt', value: f['Total Finished SqFt'] },
-          { label: 'Year Built', value: f['Year Built'] },
+          { label: 'Fin. Bsmt SqFt',   value: f['Finished Basement'] },
+          { label: 'Total SqFt',       value: f['Total Finished SqFt'] },
+          { label: 'Year Built',       value: f['Year Built'] },
         ];
         parts.push(`
           <div class="card">
@@ -1201,19 +855,19 @@
           </div>
         `);
 
-        // 6. Public Remarks (collapsed toggle, closed by default)
+        // 7. Public Remarks (collapsed toggle)
         if (f['Public Remarks']) {
           parts.push(`
             <div class="card">
               <details class="section-toggle">
                 <summary>Public Remarks</summary>
-                <div class="remarks" style="margin-top:8px">${escapeHtml(f['Public Remarks'])}</div>
+                <div class="remarks mt-2">${escapeHtml(f['Public Remarks'])}</div>
               </details>
             </div>
           `);
         }
 
-        // 7. Property History
+        // 8. Property History
         if (hist.length > 0) {
           parts.push(`
             <div class="card">
@@ -1231,7 +885,7 @@
           `);
         }
 
-        // 8. All Fields (collapsible)
+        // 9. All Fields (collapsible)
         parts.push(`
           <div class="card">
             <details class="all-fields">
@@ -1246,12 +900,12 @@
           </div>
         `);
 
-        // 9. AI Analysis card (button inside when not yet run)
+        // 10. AI Analysis card
         const aiNeedsToggle = aiText.length > 600;
         const aiBodyHtml = aiText
           ? `<div class="ai-prose ai-body${aiNeedsToggle ? ' ai-collapsed' : ''}">${markdownToHtml(aiText)}</div>
              ${aiNeedsToggle ? `<button class="ai-more-btn">View more</button>` : ''}`
-          : `<div class="ai-prose" style="margin-bottom:10px"><span class="empty-note">Not yet analyzed.</span></div>
+          : `<div class="ai-prose mb-[10px]"><span class="empty-note">Not yet analyzed.</span></div>
              ${lookupId ? `<button class="ai-analyze-btn" data-id="${escapeHtml(String(lookupId))}">Run AI Analysis</button>` : ''}`;
         parts.push(`
           <div class="card ai">
@@ -1260,7 +914,7 @@
           </div>
         `);
 
-        // 10. Performance timings
+        // 11. Performance timings
         const timingsHtml = renderTimings(payload.timings);
         if (timingsHtml) parts.push(timingsHtml);
 
@@ -1467,10 +1121,7 @@
       els.form.addEventListener('submit', (e) => {
         e.preventDefault();
         const q = els.input.value.trim();
-        if (!q) {
-          els.input.focus();
-          return;
-        }
+        if (!q) { els.input.focus(); return; }
         doLookup(q);
       });
 
@@ -1614,13 +1265,11 @@
       updateClock();
       setInterval(updateClock, 30000);
 
-      // Browser back/forward: restore the right result or clear back to home.
       window.addEventListener('popstate', (e) => {
         const id = e.state && e.state.historyId;
         if (id) {
           openHistoryItem(id, { pushUrl: false });
         } else {
-          // Navigated back to /
           els.results.classList.remove('is-visible');
           els.results.innerHTML = '';
           setStatus('');
@@ -1628,7 +1277,6 @@
         }
       });
 
-      // If the page was opened directly at /history/:id, auto-load that result.
       (function checkInitialUrl() {
         const m = location.pathname.match(/^\/history\/(\d+)$/);
         if (m) {
@@ -1638,7 +1286,6 @@
 
       loadHistory();
 
-      // Register service worker for PWA installability.
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
       }
