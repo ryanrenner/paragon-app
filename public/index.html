@@ -497,7 +497,7 @@
       function buildSmsHref(phone, agentName, streetAddress) {
         const digits = phone.replace(/[^\d+]/g, '');
         const sig = appConfig.sms_signature || '';
-        let body = `Hey ${agentName}, I have a question about ${streetAddress}.`;
+        let body = `Hey ${agentName.split(' ')[0]}, I have a question about ${streetAddress}.`;
         if (sig) body += `\n\n${sig}`;
         return `sms:${digits}&body=${encodeURIComponent(body)}`;
       }
