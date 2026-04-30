@@ -785,7 +785,7 @@
             <div class="card docs">
               <div class="docs-header">
                 <h2>Documents (${docs.length})</h2>
-                ${docUrls.length > 0 ? `<button class="copy-links-btn" data-urls="${escapeHtml(docUrls.join('\n'))}">Copy links</button>` : ''}
+                ${docUrls.length > 0 ? `<button class="copy-links-btn" data-urls="${escapeHtml(docUrls.join('\n\n'))}">Copy links</button>` : ''}
               </div>
               ${docs.map(d => `<div class="doc">
                 <div class="name"><a href="${escapeHtml(d.url || '#')}" target="_blank" rel="noopener">${escapeHtml(d.name || '(unnamed)')}</a></div>
