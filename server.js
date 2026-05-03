@@ -260,7 +260,19 @@ app.get('/api/config', (_req, res) => {
 app.get('/api/history', (_req, res) => {
   try {
     const rows = getRecentLookups(20);
-    res.json({ lookups: rows });
+    const lookups = rows.map(r => {
+      let list_agent = null;
+      if (r.full_data) {
+        try {
+          const fd = JSON.parse(r.full_data);
+          const first = Array.isArray(fd.agents) && fd.agents[0];
+          if (first && first.name) list_agent = first.name;
+        } catch {}
+      }
+      const { full_data: _fd, ...rest } = r;
+      return { ...rest, list_agent };
+    });
+    res.json({ lookups });
   } catch (err) {
     res.status(500).json({ error: shortError(err) });
   }

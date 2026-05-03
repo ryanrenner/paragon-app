@@ -761,9 +761,6 @@
         const coverImg = full.cover_photo_url
           ? `<img class="cover" src="${escapeHtml(full.cover_photo_url)}" alt="Cover photo" />`
           : '<div class="cover" aria-hidden="true"></div>';
-        const variantNote = full.query_variant
-          ? `<div class="sub">Matched with: <em>${escapeHtml(full.query_variant)}</em></div>`
-          : '';
         const priceHtml = f['Listing Price']
           ? `<div class="price-display">${escapeHtml(f['Listing Price'])}</div>`
           : '';
@@ -776,7 +773,6 @@
                 <div class="sub">${escapeHtml(cityStateZip)} · MLS# ${escapeHtml(f['MLS #'] || '')} ${statusBadge(f['Status'])}</div>
                 ${f['Subdivision'] ? `<div class="sub">Subdivision: ${escapeHtml(f['Subdivision'])}</div>` : ''}
                 ${priceHtml}
-                ${variantNote}
               </div>
             </div>
           </div>
@@ -941,7 +937,14 @@
         `);
 
         if (lookupId) {
-          parts.push(`<button class="rerun" data-id="${escapeHtml(String(lookupId))}" style="width:100%">Re-run</button>`);
+          const pulledAt = payload.queried_at ? formatChicago(payload.queried_at) : '';
+          parts.push(`
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+              <button class="rerun" style="flex:1" data-id="${escapeHtml(String(lookupId))}">Re-run</button>
+              ${pulledAt ? `<span style="font-size:12px; color:var(--color-muted); white-space:nowrap">${escapeHtml(pulledAt)}</span>` : ''}
+              <button class="delete-btn" data-id="${escapeHtml(String(lookupId))}" title="Delete from history">${trashIcon}</button>
+            </div>
+          `);
         }
 
         // 11. Performance timings
@@ -1006,15 +1009,16 @@
             const thumbHtml = r.cover_photo_url
               ? `<img class="recent-thumb" src="${escapeHtml(r.cover_photo_url)}" alt="" loading="lazy">`
               : '';
+            const agentHtml = r.list_agent
+              ? `<div class="sub">${escapeHtml(r.list_agent)}</div>`
+              : '';
             return `<div class="recent-item" data-id="${escapeHtml(r.id)}">
               ${thumbHtml}
               <div class="meta">
                 <div class="address">${err}${escapeHtml(addr)}</div>
-                <div class="sub">${escapeHtml(when)}${sub ? ' · ' + escapeHtml(sub) : ''}</div>
+                ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ''}
+                ${agentHtml}
                 ${noteAreaHtml}
-              </div>
-              <div class="item-actions">
-                <button class="delete-btn" data-id="${escapeHtml(r.id)}" title="Delete from history">${trashIcon}</button>
               </div>
             </div>`;
           })
@@ -1162,6 +1166,12 @@
         const rerunBtn = e.target.closest('.rerun');
         if (rerunBtn && rerunBtn.dataset.id) {
           rerunHistory(rerunBtn.dataset.id);
+          return;
+        }
+
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn && deleteBtn.dataset.id) {
+          showDeleteConfirm(deleteBtn.dataset.id);
           return;
         }
 

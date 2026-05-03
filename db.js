@@ -122,7 +122,7 @@ function getRecentLookups(limit = 20) {
     .prepare(
       `SELECT l.id, l.queried_at, l.query_input, l.query_variant, l.mls_number,
               l.address, l.status, l.price, l.days_on_market, l.cover_photo_url,
-              l.error, COALESCE(pn.note, '') AS note
+              l.full_data, l.error, COALESCE(pn.note, '') AS note
        FROM lookups l
        LEFT JOIN property_notes pn ON pn.mls_number = l.mls_number
        ORDER BY datetime(l.queried_at) DESC, l.id DESC
