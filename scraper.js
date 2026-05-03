@@ -597,10 +597,23 @@ async function scrapeHistory(page) {
             eventText = t;
           }
         }
+        // If the DOM month/day headers weren't detected, try parsing from generalDate (e.g. "01/05/2026")
+        let resolvedMonth = currentMonth;
+        let resolvedDay = currentDay;
+        let resolvedYear = currentYear;
+        if (generalDate && (!resolvedMonth || !resolvedDay)) {
+          const mdy = generalDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          if (mdy) {
+            const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            resolvedMonth = MONTHS[parseInt(mdy[1], 10) - 1] || mdy[1];
+            resolvedDay = parseInt(mdy[2], 10).toString();
+            if (!resolvedYear) resolvedYear = mdy[3];
+          }
+        }
         currentGroup.events.push({
-          year: currentYear,
-          month: currentMonth,
-          day: currentDay,
+          year: resolvedYear,
+          month: resolvedMonth,
+          day: resolvedDay,
           time: currentTime,
           event: eventText,
           general_date: generalDate,

@@ -160,6 +160,13 @@
     @utility agent-phone-link { color: var(--color-ink); text-decoration: none; }
     .agent-phone-link:hover   { text-decoration: underline; color: var(--color-accent); }
     @utility agent-brokerage  { color: var(--color-muted); }
+    @utility sms-buttons { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+    .sms-btn {
+      display: inline-block; font-size: 12px; padding: 3px 8px;
+      border: 1px solid var(--color-accent); border-radius: 4px;
+      color: var(--color-accent); text-decoration: none; white-space: nowrap;
+    }
+    .sms-btn:hover { background: var(--color-accent); color: #fff; }
 
     /* ── Property history ── */
     @utility history-group { border-top: 1px solid var(--color-border); padding: 10px 0; }
@@ -263,6 +270,7 @@
     .recent-item .meta    { flex: 1; min-width: 0; }
     .recent-item .address { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .recent-item .sub     { color: var(--color-muted); font-size: 12px; }
+    .recent-item .recent-thumb { width: 60px; height: 44px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
     @utility item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
     @utility rerun {
       background: #fff;
@@ -494,11 +502,18 @@
         } catch {}
       })();
 
-      function buildSmsHref(phone, agentName, streetAddress) {
+      function buildSmsHref(phone, agentName, streetAddress, template) {
         const digits = phone.replace(/[^\d+]/g, '');
         const sig = appConfig.sms_signature || '';
-        let body = `Hey ${agentName.split(' ')[0]}, I have a question about ${streetAddress}.`;
-        if (sig) body += `\n\n${sig}`;
+        const first = agentName.split(' ')[0];
+        let body;
+        if (template === 'show') {
+          body = `Hey ${first}, can I show ${streetAddress} at ? Thanks ${sig}`.trimEnd();
+        } else if (template === 'available') {
+          body = `Hey ${first}, is ${streetAddress} still available? Thanks ${sig}`.trimEnd();
+        } else {
+          body = streetAddress;
+        }
         return `sms:${digits}&body=${encodeURIComponent(body)}`;
       }
 
@@ -516,9 +531,15 @@
           const brokerageHtml = a.brokerage
             ? `<div class="agent-brokerage">${escapeHtml(a.brokerage)}</div>`
             : '';
+          const smsButtonsHtml = a.phone ? `<div class="sms-buttons">
+              <a href="${escapeHtml(buildSmsHref(a.phone, a.name || '', street))}" class="sms-btn">Question</a>
+              <a href="${escapeHtml(buildSmsHref(a.phone, a.name || '', street, 'show'))}" class="sms-btn">Can I show?</a>
+              <a href="${escapeHtml(buildSmsHref(a.phone, a.name || '', street, 'available'))}" class="sms-btn">Is it still available?</a>
+            </div>` : '';
           return `<div class="agent-contact">
             ${nameHtml ? `<div>${nameHtml}</div>` : ''}
             ${phoneHtml ? `<div>${phoneHtml}</div>` : ''}
+            ${smsButtonsHtml}
             ${brokerageHtml}
           </div>`;
         }).join('');
@@ -877,7 +898,11 @@
                 <div class="mls-label">MLS# ${escapeHtml(g.mls || '')}</div>
                 <ul class="history-events">
                   ${(g.events || []).map(e => `<li>
-                    <span class="date">${escapeHtml([e.month, e.day].filter(Boolean).join(' '))} ${escapeHtml(e.year || '')}${e.time ? ' · ' + escapeHtml(e.time) : ''}</span>
+                    <span class="date">${escapeHtml(
+                      (e.month && e.day)
+                        ? [e.month, e.day].join(' ') + ' ' + (e.year || '') + (e.time ? ' · ' + e.time : '')
+                        : (e.general_date || e.year || '') + (e.time ? ' · ' + e.time : '')
+                    )}</span>
                     <span><strong>${escapeHtml(e.event || '')}</strong>${e.price ? ' — ' + escapeHtml(e.price) : ''}</span>
                   </li>`).join('')}
                 </ul>
@@ -914,6 +939,10 @@
             ${aiBodyHtml}
           </div>
         `);
+
+        if (lookupId) {
+          parts.push(`<button class="rerun" data-id="${escapeHtml(String(lookupId))}" style="width:100%">Re-run</button>`);
+        }
 
         // 11. Performance timings
         const timingsHtml = renderTimings(payload.timings);
@@ -974,14 +1003,17 @@
                 <textarea class="note-textarea-inline" style="display:none">${escapeHtml(noteText)}</textarea>
                 <div class="note-save-inline"></div>
               </div>` : '';
+            const thumbHtml = r.cover_photo_url
+              ? `<img class="recent-thumb" src="${escapeHtml(r.cover_photo_url)}" alt="" loading="lazy">`
+              : '';
             return `<div class="recent-item" data-id="${escapeHtml(r.id)}">
+              ${thumbHtml}
               <div class="meta">
                 <div class="address">${err}${escapeHtml(addr)}</div>
                 <div class="sub">${escapeHtml(when)}${sub ? ' · ' + escapeHtml(sub) : ''}</div>
                 ${noteAreaHtml}
               </div>
               <div class="item-actions">
-                <button class="rerun" data-id="${escapeHtml(r.id)}" title="Run a fresh scrape">Re-run</button>
                 <button class="delete-btn" data-id="${escapeHtml(r.id)}" title="Delete from history">${trashIcon}</button>
               </div>
             </div>`;
@@ -1127,6 +1159,12 @@
       });
 
       els.results.addEventListener('click', (e) => {
+        const rerunBtn = e.target.closest('.rerun');
+        if (rerunBtn && rerunBtn.dataset.id) {
+          rerunHistory(rerunBtn.dataset.id);
+          return;
+        }
+
         const aiBtn = e.target.closest('.ai-more-btn');
         if (aiBtn) {
           const body = aiBtn.previousElementSibling;
