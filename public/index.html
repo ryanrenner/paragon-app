@@ -263,14 +263,14 @@
       background: var(--color-panel);
       border: 1px solid var(--color-border);
       border-radius: 8px; padding: 10px 12px;
-      display: flex; gap: 10px; align-items: stretch;
+      display: flex; gap: 10px; align-items: center;
       cursor: pointer; transition: border-color 0.12s;
     }
     .recent-item:hover { border-color: #9ca3af; }
-    .recent-item .meta    { flex: 2; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .recent-item .meta    { flex: 1; min-width: 0; }
     .recent-item .address { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .recent-item .sub     { color: var(--color-muted); font-size: 12px; }
-    .recent-item .recent-thumb { flex: 1; min-height: 70px; object-fit: cover; border-radius: 5px; }
+    .recent-item .recent-thumb { width: 90px; height: 66px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
     @utility item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
     @utility rerun {
       background: #fff;
