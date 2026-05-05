@@ -508,9 +508,9 @@
         const first = agentName.split(' ')[0];
         let body;
         if (template === 'show') {
-          body = `Hey ${first}, can I show ${streetAddress} at ? Thanks ${sig}`.trimEnd();
+          body = `Hey ${first}, can I show ${streetAddress} at ? ${sig}`.trimEnd();
         } else if (template === 'available') {
-          body = `Hey ${first}, is ${streetAddress} still available? Thanks ${sig}`.trimEnd();
+          body = `Hey ${first}, is ${streetAddress} still available? ${sig}`.trimEnd();
         } else {
           body = streetAddress;
         }
