@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>MLS Lookup</title>
+  <title>Paragon Lookup</title>
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -259,12 +259,22 @@
     .ai-analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* ── Recent history list ── */
+    @utility swipe-row { position: relative; overflow: hidden; border-radius: 8px; }
+    .swipe-action {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 72px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      background: var(--color-danger); color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+      cursor: pointer; border-radius: 8px; user-select: none; pointer-events: none;
+    }
+    .swipe-action.visible { pointer-events: auto; }
     @utility recent-item {
       background: var(--color-panel);
       border: 1px solid var(--color-border);
       border-radius: 8px; padding: 10px 12px;
       display: flex; gap: 10px; align-items: center;
-      cursor: pointer; transition: border-color 0.12s;
+      cursor: pointer; transition: border-color 0.12s, transform 0.2s ease;
+      position: relative; will-change: transform;
     }
     .recent-item:hover { border-color: #9ca3af; }
     .recent-item .meta    { flex: 1; min-width: 0; }
@@ -420,6 +430,29 @@
       let allHistoryRows = [];
       let historyShowAll = false;
       let pendingDeleteId = null;
+      let openSwipeRow = null;
+
+      function swipeSnapOpen(row) {
+        const item = row.querySelector('.recent-item');
+        if (!item) return;
+        item.style.transition = 'transform 0.2s ease';
+        item.style.transform = 'translateX(-72px)';
+        row.querySelector('.swipe-action').classList.add('visible');
+        openSwipeRow = row;
+      }
+
+      function swipeSnapBack(row) {
+        const item = row && row.querySelector('.recent-item');
+        if (!item) return;
+        item.style.transition = 'transform 0.2s ease';
+        item.style.transform = 'translateX(0)';
+        row.querySelector('.swipe-action').classList.remove('visible');
+        if (openSwipeRow === row) openSwipeRow = null;
+      }
+
+      function closeOpenSwipe() {
+        if (openSwipeRow) swipeSnapBack(openSwipeRow);
+      }
 
       // ---------- Helpers ----------
 
@@ -764,12 +797,17 @@
         const priceHtml = f['Listing Price']
           ? `<div class="price-display">${escapeHtml(f['Listing Price'])}</div>`
           : '';
+        const fullAddress = [street, cityStateZip].filter(Boolean).join(', ');
+        const mapUrl = fullAddress ? 'https://maps.apple.com/?q=' + encodeURIComponent(fullAddress) : '';
+        const mapIconHtml = mapUrl
+          ? `<a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener" title="Open in Maps" aria-label="Open address in Maps" style="display:inline-flex;align-items:center;margin-left:7px;color:var(--color-muted);vertical-align:middle;text-decoration:none;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></a>`
+          : '';
         parts.push(`
           <div class="card">
             <div class="header-row">
               ${coverImg}
               <div class="title-block">
-                <h3>${escapeHtml(street || '(no address)')}</h3>
+                <h3 style="display:flex;align-items:center;flex-wrap:wrap">${escapeHtml(street || '(no address)')}${mapIconHtml}</h3>
                 <div class="sub">${escapeHtml(cityStateZip)} · MLS# ${escapeHtml(f['MLS #'] || '')} ${statusBadge(f['Status'])}</div>
                 ${f['Subdivision'] ? `<div class="sub">Subdivision: ${escapeHtml(f['Subdivision'])}</div>` : ''}
                 ${priceHtml}
@@ -1012,13 +1050,19 @@
             const agentHtml = r.list_agent
               ? `<div class="sub">${escapeHtml(r.list_agent)}</div>`
               : '';
-            return `<div class="recent-item" data-id="${escapeHtml(r.id)}">
-              ${thumbHtml}
-              <div class="meta">
-                <div class="address">${err}${escapeHtml(addr)}</div>
-                ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ''}
-                ${agentHtml}
-                ${noteAreaHtml}
+            return `<div class="swipe-row">
+              <div class="swipe-action" data-id="${escapeHtml(r.id)}" aria-label="Delete">
+                ${trashIcon}
+                Delete
+              </div>
+              <div class="recent-item" data-id="${escapeHtml(r.id)}">
+                ${thumbHtml}
+                <div class="meta">
+                  <div class="address">${err}${escapeHtml(addr)}</div>
+                  ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ''}
+                  ${agentHtml}
+                  ${noteAreaHtml}
+                </div>
               </div>
             </div>`;
           })
@@ -1261,8 +1305,18 @@
           return;
         }
 
+        const swipeAction = e.target.closest('.swipe-action');
+        if (swipeAction && swipeAction.dataset.id) {
+          const row = swipeAction.closest('.swipe-row');
+          if (row) swipeSnapBack(row);
+          showDeleteConfirm(swipeAction.dataset.id);
+          return;
+        }
+
         const item = e.target.closest('.recent-item');
         if (item && item.dataset.id) {
+          const row = item.closest('.swipe-row');
+          if (row && openSwipeRow === row) { swipeSnapBack(row); return; }
           openHistoryItem(item.dataset.id);
         }
       });
@@ -1288,6 +1342,52 @@
           }
         }
       });
+
+      // ---------- Swipe-to-delete (touch) ----------
+
+      (function initSwipeDelete() {
+        const THRESHOLD = 72; // px to fully reveal delete button
+        const SNAP_AT   = 36; // px past which we snap open on release
+        let touch = null;     // { row, item, startX, startY, swiping, dx }
+
+        els.recent.addEventListener('touchstart', (e) => {
+          const row = e.target.closest('.swipe-row');
+          if (!row) { closeOpenSwipe(); return; }
+          if (openSwipeRow && openSwipeRow !== row) closeOpenSwipe();
+          const t = e.touches[0];
+          touch = { row, item: row.querySelector('.recent-item'), startX: t.clientX, startY: t.clientY, swiping: false, dx: 0 };
+        }, { passive: true });
+
+        els.recent.addEventListener('touchmove', (e) => {
+          if (!touch) return;
+          const t = e.touches[0];
+          const dx = t.clientX - touch.startX;
+          const dy = t.clientY - touch.startY;
+
+          if (!touch.swiping) {
+            if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+            if (Math.abs(dy) > Math.abs(dx)) { touch = null; return; }
+            touch.swiping = true;
+          }
+
+          e.preventDefault();
+          const base = openSwipeRow === touch.row ? -THRESHOLD : 0;
+          touch.dx = Math.max(-THRESHOLD, Math.min(0, base + dx));
+          touch.item.style.transition = 'none';
+          touch.item.style.transform = `translateX(${touch.dx}px)`;
+          touch.row.querySelector('.swipe-action').classList.toggle('visible', touch.dx < -8);
+        }, { passive: false });
+
+        els.recent.addEventListener('touchend', () => {
+          if (!touch || !touch.swiping) { touch = null; return; }
+          if (touch.dx < -SNAP_AT) {
+            swipeSnapOpen(touch.row);
+          } else {
+            swipeSnapBack(touch.row);
+          }
+          touch = null;
+        }, { passive: true });
+      })();
 
       // ---------- Modal ----------
 
