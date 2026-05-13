@@ -1,14 +1,17 @@
 <!--
 Documents accordion - single PDF row structure.
 The accordion wrapper is a .MuiAccordion-root; click the heading button to expand.
-Inside the expanded accordion, each PDF is a <li> with this structure.
+
+NOTE: Paragon removed href attributes from document links (observed ~May 2026).
+Clicking a link now opens the PDF in a new popup/tab. The scraper handles this
+by using page.waitForEvent('popup') per link.
 
 Fields to extract per document:
-- URL: href on either <a> (both point to the same PDF)
-- Name: text of the second <a> (the one without <svg>)
-- Size: <span> with size like "216.25 KB"
+- URL: captured from popup.url() after clicking the <a>
+- Name: text of .MuiListItemText-primary
+- Size: <span> with size like "5.75 MB"
 - Date Added: <span> starting with "Added "
-- Visibility: <span> with "Public" or "Private"
+- Visibility: <span> with "Public" or "Private" (inside a MuiChip)
 -->
 
 <div class="MuiPaper-root MuiAccordion-root Mui-expanded">
@@ -20,33 +23,32 @@ Fields to extract per document:
     </button>
   </h3>
   <div class="MuiCollapse-root Mui-expanded">
-    <!-- Inside the expanded region: -->
 
-    <!-- One <li> per PDF document, like this: -->
-    <li>
-      <div>
-        <!-- Icon link -->
-        <a href="https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1126824.pdf" target="_blank">
-          <svg><title>Pdf</title></svg>
-        </a>
+    <!-- One <a> per PDF document (no href — URL only available via popup on click): -->
+    <a class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1g55a76"
+       style="cursor: pointer; display: flex; width: 100%;">
+      <div class="MuiListItemAvatar-root css-4kzajp">
+        <svg role="img" viewBox="0 0 24 24" style="color: red;">
+          <path d="..."></path>
+          <title>Pdf</title>
+        </svg>
       </div>
-      <div>
-        <span>
-          <!-- Name link (same URL, text label) -->
-          <a href="https://gprmls.paragonrels.com/ParagonLS/Files/AssociatedDocs/gprmls/9/gprmls_1126824.pdf" target="_blank">LBP</a>
+      <div class="MuiListItemText-root MuiListItemText-multiline css-8v2ml9">
+        <span class="MuiListItemText-primary css-1fjokbw">
+          <p class="css-w5rtz8">Covenants</p>
         </span>
-        <div>
-          <span>216.25 KB</span>
-          <div>
-            <svg></svg>
-            <span>Added 02/13/2026</span>
+        <div class="MuiListItemText-secondary css-dhqnxn">
+          <span class="css-1mb2umo">5.75 MB</span>
+          <div class="css-1ayrgdu">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><!-- calendar icon --></svg>
+            <span class="css-1bpsh2l">Added 05/04/2026</span>
           </div>
-          <div>
-            <span>Public</span>
+          <div class="MuiChip-root MuiChip-filledSecondary css-jeqp1q">
+            <span class="MuiChip-label MuiChip-labelSmall css-b9zgoq">Private</span>
           </div>
         </div>
       </div>
-    </li>
+    </a>
 
   </div>
 </div>

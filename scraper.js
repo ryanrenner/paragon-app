@@ -416,67 +416,138 @@ async function scrapeDocuments(page) {
   const heading = page.getByRole('button', { name: /^Documents\b/i }).first();
   try {
     const exists = await heading.count();
-    if (exists > 0) {
-      const expanded = await heading.getAttribute('aria-expanded').catch(() => 'false');
-      if (expanded !== 'true') {
-        await heading.click();
-      }
-      // Wait for at least one PDF link to appear, OR for a short grace
-      // period if the listing legitimately has no documents.
-      await Promise.race([
-        page.waitForSelector('a[href*="AssociatedDocs"]', { timeout: 4000 }),
-        page.waitForTimeout(4000),
-      ]);
+    if (exists === 0) return [];
+    const expanded = await heading.getAttribute('aria-expanded').catch(() => 'false');
+    if (expanded !== 'true') {
+      await heading.click();
     }
   } catch {
-    // Accordion missing — listing has no Documents section at all.
     return [];
   }
 
-  return await page.evaluate(() => {
-    const results = [];
-    const anchors = document.querySelectorAll('a[href*="AssociatedDocs"]');
-    // Iterate, deduping by URL. For each PDF, walk up to the <li> that
-    // wraps it and pull size/date/visibility from the text content.
-    const seen = new Set();
-    for (const a of anchors) {
-      const url = a.getAttribute('href');
-      if (!url || seen.has(url)) continue;
-      seen.add(url);
+  // Wait for document links to render. Errors are suppressed so the race
+  // never throws — if nothing appears in 5s we proceed and evaluate below.
+  await Promise.race([
+    page.locator('a[href*="AssociatedDocs"]').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+    page.locator('.MuiListItemAvatar-root').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+  ]);
 
-      // Find the nearest <li> ancestor.
-      let li = a.parentElement;
-      while (li && li.tagName !== 'LI') li = li.parentElement;
-      if (!li) continue;
-
-      // Name: the text-only <a> (not the one wrapping the svg).
-      let name = null;
-      const nameAnchors = li.querySelectorAll('a[href*="AssociatedDocs"]');
-      for (const na of nameAnchors) {
-        const hasSvg = na.querySelector('svg');
-        if (!hasSvg) {
-          name = na.textContent.trim();
-          break;
+  // Old format: href is directly in the DOM (pre-Paragon-UI-update behavior).
+  const oldStyleCount = await page.locator('a[href*="AssociatedDocs"]').count();
+  if (oldStyleCount > 0) {
+    return await page.evaluate(() => {
+      const results = [];
+      const anchors = document.querySelectorAll('a[href*="AssociatedDocs"]');
+      const seen = new Set();
+      for (const a of anchors) {
+        const url = a.getAttribute('href');
+        if (!url || seen.has(url)) continue;
+        seen.add(url);
+        let li = a.parentElement;
+        while (li && li.tagName !== 'LI') li = li.parentElement;
+        if (!li) continue;
+        let name = null;
+        const nameAnchors = li.querySelectorAll('a[href*="AssociatedDocs"]');
+        for (const na of nameAnchors) {
+          if (!na.querySelector('svg')) { name = na.textContent.trim(); break; }
         }
+        if (!name) name = (a.textContent || '').trim() || null;
+        let size = null, dateAdded = null, visibility = null;
+        for (const span of li.querySelectorAll('span')) {
+          const t = (span.textContent || '').trim();
+          if (!t) continue;
+          if (/^\d[\d.,]*\s*(KB|MB|GB)$/i.test(t)) size = t;
+          else if (/^Added\s/i.test(t)) dateAdded = t.replace(/^Added\s+/i, '').trim();
+          else if (/^(Public|Private)$/i.test(t)) visibility = t;
+        }
+        results.push({ name, url, size, date_added: dateAdded, visibility });
       }
-      if (!name) name = (a.textContent || '').trim() || null;
+      return results;
+    });
+  }
 
-      // Size, date, visibility — pull from span text within the <li>.
-      let size = null;
-      let dateAdded = null;
-      let visibility = null;
-      for (const span of li.querySelectorAll('span')) {
+  // New format: <a> elements have no href; clicking opens the PDF in a popup.
+  // Use page.evaluate to find document links inside the Documents accordion —
+  // this avoids any Playwright locator/CSS-:has() compatibility concerns and
+  // lets us walk the real DOM directly.
+  const docMetas = await page.evaluate(() => {
+    // Find the Documents accordion by walking up from its heading text.
+    let accordion = null;
+    for (const el of document.querySelectorAll('button')) {
+      if (/^Documents\b/i.test((el.textContent || '').trim())) {
+        let p = el.parentElement;
+        while (p && !/MuiAccordion/.test(p.className || '')) p = p.parentElement;
+        if (p) { accordion = p; break; }
+      }
+    }
+    if (!accordion) return [];
+
+    // Collect <a> elements that contain a MuiListItemAvatar-root child —
+    // that's the PDF icon div unique to document rows.
+    const links = Array.from(accordion.querySelectorAll('a')).filter(
+      (a) => a.querySelector('.MuiListItemAvatar-root')
+    );
+
+    return links.map((a, idx) => {
+      const primaryEl = a.querySelector('.MuiListItemText-primary');
+      const name = primaryEl ? (primaryEl.textContent || '').trim() : null;
+      let size = null, dateAdded = null, visibility = null;
+      for (const span of a.querySelectorAll('span')) {
         const t = (span.textContent || '').trim();
         if (!t) continue;
         if (/^\d[\d.,]*\s*(KB|MB|GB)$/i.test(t)) size = t;
         else if (/^Added\s/i.test(t)) dateAdded = t.replace(/^Added\s+/i, '').trim();
         else if (/^(Public|Private)$/i.test(t)) visibility = t;
       }
-
-      results.push({ name, url, size, date_added: dateAdded, visibility });
-    }
-    return results;
+      const href = a.getAttribute('href') || null;
+      return { idx, name, href, size, date_added: dateAdded, visibility };
+    });
   });
+
+  if (docMetas.length === 0) return [];
+
+  // For each document: if it already has an href use it directly; otherwise
+  // click and capture the URL from the popup window Paragon opens.
+  const results = [];
+  const seenUrls = new Set();
+
+  // Re-resolve the accordion locator for clicking (Playwright can't reuse
+  // DOM handles returned from evaluate).
+  const accordionLocator = page.locator('[class*="MuiAccordion"]').filter({
+    hasText: /^Documents/,
+  }).first();
+
+  for (const meta of docMetas) {
+    if (meta.href && meta.href.toLowerCase().includes('associateddocs')) {
+      if (!seenUrls.has(meta.href)) {
+        seenUrls.add(meta.href);
+        results.push({ name: meta.name, url: meta.href, size: meta.size, date_added: meta.date_added, visibility: meta.visibility });
+      }
+      continue;
+    }
+
+    const link = accordionLocator
+      .locator('a')
+      .filter({ has: page.locator('.MuiListItemAvatar-root') })
+      .nth(meta.idx);
+
+    try {
+      const [popup] = await Promise.all([
+        page.waitForEvent('popup', { timeout: 8000 }),
+        link.click(),
+      ]);
+      const url = popup.url();
+      await popup.close();
+      if (url && url.toLowerCase().includes('associateddocs') && !seenUrls.has(url)) {
+        seenUrls.add(url);
+        results.push({ name: meta.name, url, size: meta.size, date_added: meta.date_added, visibility: meta.visibility });
+      }
+    } catch {
+      // Popup capture failed for this document — skip it.
+    }
+  }
+
+  return results;
 }
 
 // --------------------------------------------------------------------------
