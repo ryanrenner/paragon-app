@@ -561,10 +561,21 @@ async function scrapeDocuments(page) {
     }
 
     try {
-      // DOM-level click via evaluate works for <a> document links (unlike the
-      // accordion button which requires Playwright's real pointer click).
-      // context().waitForEvent('page') catches the new tab regardless of whether
-      // Paragon uses window.open(), target="_blank", etc.
+      // Intercept via context-level 'request' event rather than framenavigated.
+      // In headless Chrome, PDF navigations are aborted before the frame ever
+      // commits to the PDF URL, so framenavigated only fires with about:blank
+      // then ':' — never the real https URL. The 'request' event fires when the
+      // outgoing network request is dispatched, before any response or abort.
+      let capturedPdfUrl = null;
+      const onRequest = (req) => {
+        const u = req.url();
+        if (/^https?:/.test(u) && (/AssociatedDocs/i.test(u) || /\.pdf($|\?)/i.test(u))) {
+          console.log(`[docs] request captured: ${u}`);
+          capturedPdfUrl = u;
+        }
+      };
+      page.context().on('request', onRequest);
+
       const [newTab] = await Promise.all([
         page.context().waitForEvent('page', { timeout: 10000 }),
         page.evaluate((idx) => {
@@ -581,20 +592,16 @@ async function scrapeDocuments(page) {
           }
         }, meta.idx),
       ]);
-      // Log every main-frame navigation in the new tab so we can see what
-      // URLs Paragon visits before settling on the document URL.
-      newTab.on('framenavigated', (frame) => {
-        if (frame === newTab.mainFrame()) {
-          console.log(`[docs] tab navigated: ${frame.url()}`);
-        }
-      });
-      // Paragon opens about:blank then navigates asynchronously via JS.
-      // waitForLoadState('domcontentloaded') resolves on the blank page
-      // before the real URL loads — wait explicitly for a real https URL.
-      await newTab.waitForURL((u) => /^https?:/.test(u), { timeout: 10000 }).catch(() => {});
-      const url = newTab.url();
+
+      console.log(`[docs] new tab initial URL: ${newTab.url()}`);
+
+      // Allow time for the request event to fire before we read capturedPdfUrl.
+      await newTab.waitForLoadState('domcontentloaded').catch(() => {});
+      page.context().off('request', onRequest);
+
+      const url = capturedPdfUrl || (/^https?:\/\//.test(newTab.url()) ? newTab.url() : null) || newTab.url();
       console.log(`[docs] final tab URL for "${meta.name}": ${url}`);
-      await newTab.close();
+      await newTab.close().catch(() => {});
       if (/^https?:\/\//.test(url) && !seenUrls.has(url)) {
         seenUrls.add(url);
         results.push({ name: meta.name, url, size: meta.size, date_added: meta.date_added, visibility: meta.visibility });

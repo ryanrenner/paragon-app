@@ -25,7 +25,7 @@ const { login, scrapeListing } = require('../scraper');
 
   const headless = process.env.PLAYWRIGHT_HEADFUL ? false : true;
   const browser = await chromium.launch({ headless });
-  const context = await browser.newContext();
+  const context = await browser.newContext({ acceptDownloads: true });
   const page = await context.newPage();
   try {
     console.log('[smoke] logging in...');
