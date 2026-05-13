@@ -412,21 +412,35 @@ async function scrapeAllFields(page) {
 // --------------------------------------------------------------------------
 
 async function scrapeDocuments(page) {
-  // Expand the Documents accordion if it's collapsed.
-  const heading = page.getByRole('button', { name: /^Documents\b/i }).first();
-  try {
-    const exists = await heading.count();
-    if (exists === 0) return [];
-    const expanded = await heading.getAttribute('aria-expanded').catch(() => 'false');
-    if (expanded !== 'true') {
-      await heading.click();
+  // Expand the Documents accordion via a direct DOM click — Playwright's
+  // pointer-event simulation (even with force:true) is blocked by the MUI
+  // overlay on this page, but el.click() from page.evaluate always reaches
+  // the React handler.
+  const expanded = await page.evaluate(() => {
+    for (const el of document.querySelectorAll('p, span')) {
+      if ((el.textContent || '').trim() !== 'Documents') continue;
+      let btn = el.parentElement;
+      while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
+      if (!btn) continue;
+      if (btn.getAttribute('aria-expanded') !== 'true') btn.click();
+      return true; // accordion was found (may or may not have needed clicking)
     }
-  } catch {
-    return [];
-  }
+    return false; // no Documents accordion on this listing
+  });
+  if (!expanded) return [];
 
-  // Wait for document links to render. Errors are suppressed so the race
-  // never throws — if nothing appears in 5s we proceed and evaluate below.
+  // Wait for aria-expanded="true" to confirm React finished mounting content.
+  await page.waitForFunction(() => {
+    for (const el of document.querySelectorAll('p, span')) {
+      if ((el.textContent || '').trim() !== 'Documents') continue;
+      let btn = el.parentElement;
+      while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
+      return btn && btn.getAttribute('aria-expanded') === 'true';
+    }
+    return false;
+  }, { timeout: 5000 }).catch(() => {});
+
+  // Wait for document links to render.
   await Promise.race([
     page.locator('a[href*="AssociatedDocs"]').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
     page.locator('.MuiListItemAvatar-root').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
@@ -470,25 +484,54 @@ async function scrapeDocuments(page) {
   // Use page.evaluate to find document links inside the Documents accordion —
   // this avoids any Playwright locator/CSS-:has() compatibility concerns and
   // lets us walk the real DOM directly.
-  const docMetas = await page.evaluate(() => {
-    // Find the Documents accordion by walking up from its heading text.
+  const docResult = await page.evaluate(() => {
+    const diag = {
+      accordionFound: false,
+      accordionExpanded: false,
+      rawLinks: 0,
+      filteredLinks: 0,
+      // First 20 button texts — helps identify what text the Documents button
+      // actually has so we can tune the regex if needed.
+      buttonTexts: Array.from(document.querySelectorAll('button'))
+        .map((b) => (b.textContent || '').trim().substring(0, 60))
+        .filter(Boolean)
+        .slice(0, 20),
+    };
+
+    // Find the accordion by locating the <p> with exact text "Documents" — the
+    // same strategy scrapeHistory uses. Matching on button.textContent fails
+    // because the expand icon SVG has <title>Caret</title>, making the full
+    // textContent "DocumentsCaret" which doesn't satisfy /^Documents\b/.
     let accordion = null;
-    for (const el of document.querySelectorAll('button')) {
-      if (/^Documents\b/i.test((el.textContent || '').trim())) {
+    for (const el of document.querySelectorAll('p, span')) {
+      if ((el.textContent || '').trim() === 'Documents') {
         let p = el.parentElement;
-        while (p && !/MuiAccordion/.test(p.className || '')) p = p.parentElement;
-        if (p) { accordion = p; break; }
+        // Walk up past MuiAccordion-heading (the H3 summary wrapper — content is
+        // NOT inside it). Stop at the first ancestor that isn't the heading and
+        // actually contains <a> elements (the full MuiPaper accordion container).
+        while (p) {
+          const cls = p.className || '';
+          if (!cls.includes('MuiAccordion-heading') && p.querySelectorAll('a').length > 0) break;
+          p = p.parentElement;
+        }
+        if (p) {
+          accordion = p;
+          diag.accordionFound = true;
+          const btn = p.querySelector('button');
+          diag.accordionExpanded = btn ? btn.getAttribute('aria-expanded') === 'true' : false;
+          break;
+        }
       }
     }
-    if (!accordion) return [];
+    if (!accordion) return { diag, metas: [] };
 
-    // Collect <a> elements that contain a MuiListItemAvatar-root child —
-    // that's the PDF icon div unique to document rows.
-    const links = Array.from(accordion.querySelectorAll('a')).filter(
-      (a) => a.querySelector('.MuiListItemAvatar-root')
-    );
+    const allLinks = Array.from(accordion.querySelectorAll('a'));
+    diag.rawLinks = allLinks.length;
 
-    return links.map((a, idx) => {
+    const docLinks = allLinks.filter((a) => a.querySelector('.MuiListItemAvatar-root'));
+    diag.filteredLinks = docLinks.length;
+
+    const metas = docLinks.map((a, idx) => {
       const primaryEl = a.querySelector('.MuiListItemText-primary');
       const name = primaryEl ? (primaryEl.textContent || '').trim() : null;
       let size = null, dateAdded = null, visibility = null;
@@ -502,8 +545,13 @@ async function scrapeDocuments(page) {
       const href = a.getAttribute('href') || null;
       return { idx, name, href, size, date_added: dateAdded, visibility };
     });
+
+    return { diag, metas };
   });
 
+  console.log(`[docs] diag: ${JSON.stringify(docResult.diag)}`);
+  const docMetas = docResult.metas || [];
+  console.log(`[docs] found ${docMetas.length} document link(s) in accordion`);
   if (docMetas.length === 0) return [];
 
   // For each document: if it already has an href use it directly; otherwise
@@ -532,18 +580,24 @@ async function scrapeDocuments(page) {
       .nth(meta.idx);
 
     try {
+      // force: true bypasses the MUI overlay that intercepts pointer events
+      // in headless Chromium (same issue as expandAllFieldsDetail).
       const [popup] = await Promise.all([
         page.waitForEvent('popup', { timeout: 8000 }),
-        link.click(),
+        link.click({ force: true }),
       ]);
+      // Wait for the popup to finish navigating before reading its URL —
+      // window.open() can fire before the PDF URL is fully resolved.
+      await popup.waitForLoadState('domcontentloaded', { timeout: 8000 }).catch(() => {});
       const url = popup.url();
+      console.log(`[docs] popup URL for "${meta.name}": ${url}`);
       await popup.close();
       if (url && url.toLowerCase().includes('associateddocs') && !seenUrls.has(url)) {
         seenUrls.add(url);
         results.push({ name: meta.name, url, size: meta.size, date_added: meta.date_added, visibility: meta.visibility });
       }
-    } catch {
-      // Popup capture failed for this document — skip it.
+    } catch (err) {
+      console.log(`[docs] popup capture failed for "${meta.name}": ${err.message}`);
     }
   }
 
