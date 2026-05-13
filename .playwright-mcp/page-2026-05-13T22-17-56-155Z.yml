@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e751]:
+      - generic [ref=e752]:
+        - button "menu." [ref=e755] [cursor=pointer]:
+          - img [ref=e756]
+        - generic [ref=e758]:
+          - heading "0 Results" [level=6] [ref=e760]
+          - heading "Residential (My Default)" [level=6] [ref=e761]
+        - button "Views." [ref=e763] [cursor=pointer]:
+          - img [ref=e764]
+        - button "Filter." [ref=e767] [cursor=pointer]:
+          - img [ref=e768]
+        - button "Save Search." [ref=e771] [cursor=pointer]:
+          - img [ref=e772]
+        - button "My Saved Searches." [ref=e775] [cursor=pointer]:
+          - img [ref=e776]
+        - button "Sort." [ref=e779] [cursor=pointer]:
+          - img [ref=e780]
+    - paragraph [ref=e785]: No results found.
+  - alert [ref=e9]: Search Results - Paragon Connect

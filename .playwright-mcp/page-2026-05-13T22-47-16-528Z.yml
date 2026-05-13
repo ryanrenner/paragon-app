@@ -1,0 +1,599 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e813]:
+      - generic [ref=e814]:
+        - button [ref=e1923] [cursor=pointer]:
+          - img [ref=e818]
+        - generic [ref=e820]:
+          - heading [level=6] [ref=e1924]: 1 Results
+          - heading [level=6] [ref=e1925]: Residential (My Default)
+        - button [ref=e1926] [cursor=pointer]:
+          - img [ref=e826]
+        - button [ref=e1927] [cursor=pointer]:
+          - img [ref=e830]
+        - button [ref=e1928] [cursor=pointer]:
+          - img [ref=e834]
+        - button [ref=e1929] [cursor=pointer]:
+          - img [ref=e838]
+        - button [ref=e1930] [cursor=pointer]:
+          - img [ref=e842]
+    - group [ref=e1931] [cursor=pointer]:
+      - generic [ref=e849]:
+        - generic [ref=e850]:
+          - checkbox [ref=e1932]:
+            - checkbox [ref=e1933]
+            - img [ref=e1934]
+          - link [ref=e1935]
+          - button [ref=e1936]:
+            - img [ref=e860]
+        - generic [ref=e867]:
+          - heading [level=6] [ref=e1937]: 7022 N 88th Avenue
+          - generic [ref=e869]:
+            - paragraph [ref=e870]: Omaha, NE 68122
+            - paragraph [ref=e871]: MLS# 22612200 - Residential
+            - paragraph [ref=e872]: Total Finished SqFt - 1,466
+            - generic [ref=e1938]: ACTIVE
+            - generic [ref=e876]: $270,000
+            - generic [ref=e877]:
+              - generic [ref=e1940]:
+                - text: "Beds: 3"
+                - separator [ref=e879]
+              - generic [ref=e1941]:
+                - text: "Baths: 2"
+                - separator [ref=e881]
+              - generic [ref=e1942]: "DOM: 9"
+    - iframe [ref=e1944]:
+      - alert [ref=f4e3]
+  - alert [ref=e737]: Search Results - Paragon Connect
+  - dialog [ref=e1947]:
+    - banner [ref=e1948]:
+      - generic [ref=e1949]:
+        - button "back." [ref=e1952] [cursor=pointer]:
+          - img [ref=e1953]
+        - heading "#22612200" [level=6] [ref=e1957]
+        - button "Find." [ref=e1959] [cursor=pointer]:
+          - img [ref=e1960]
+        - button "Recommend." [ref=e1963] [cursor=pointer]:
+          - img [ref=e1964]
+        - button "Add To Cart." [ref=e1967] [cursor=pointer]:
+          - img [ref=e1968]
+        - button "Match My Contacts." [ref=e1971] [cursor=pointer]:
+          - img [ref=e1972]
+        - button "Third Party Integrations." [ref=e1975] [cursor=pointer]:
+          - img [ref=e1976]
+        - button "More." [ref=e1980] [cursor=pointer]:
+          - img [ref=e1981]
+    - generic [ref=e1984]:
+      - generic [ref=e1985]:
+        - generic [ref=e1986]:
+          - button "Previous image" [ref=e1987] [cursor=pointer]:
+            - img [ref=e1988]
+          - button "Next image" [ref=e1990] [cursor=pointer]:
+            - img [ref=e1991]
+          - list [ref=e1996]:
+            - listitem [ref=e1997]:
+              - img "Listing photo." [ref=e1999]
+            - listitem [ref=e2000]:
+              - img "Listing photo." [ref=e2002]
+            - listitem [ref=e2003]:
+              - img "Listing photo." [ref=e2005]
+            - listitem [ref=e2006]:
+              - img "Listing photo." [ref=e2008]
+            - listitem [ref=e2009]:
+              - img "Listing photo." [ref=e2011]
+            - listitem [ref=e2012]:
+              - img "Listing photo." [ref=e2014]
+            - listitem [ref=e2015]:
+              - img "Listing photo." [ref=e2017]
+            - listitem [ref=e2018]:
+              - img "Listing photo." [ref=e2020]
+            - listitem [ref=e2021]:
+              - img "Listing photo." [ref=e2023]
+            - listitem [ref=e2024]:
+              - img "Listing photo." [ref=e2026]
+            - listitem [ref=e2027]:
+              - img "Listing photo." [ref=e2029]
+            - listitem [ref=e2030]:
+              - img "Listing photo." [ref=e2032]
+            - listitem [ref=e2033]:
+              - img "Listing photo." [ref=e2035]
+            - listitem [ref=e2036]:
+              - img "Listing photo." [ref=e2038]
+            - listitem [ref=e2039]:
+              - img "Listing photo." [ref=e2041]
+            - listitem [ref=e2042]:
+              - img "Listing photo." [ref=e2044]
+            - listitem [ref=e2045]:
+              - img "Listing photo." [ref=e2047]
+            - listitem [ref=e2048]:
+              - img "Listing photo." [ref=e2050]
+            - listitem [ref=e2051]:
+              - img "Listing photo." [ref=e2053]
+            - listitem [ref=e2054]:
+              - img "Listing photo." [ref=e2056]
+            - listitem [ref=e2057]:
+              - img "Listing photo." [ref=e2059]
+            - listitem [ref=e2060]:
+              - img "Listing photo." [ref=e2062]
+            - listitem [ref=e2063]:
+              - img "Listing photo." [ref=e2065]
+            - listitem [ref=e2066]:
+              - img "Listing photo." [ref=e2068]
+            - listitem [ref=e2069]:
+              - img "Listing photo." [ref=e2071]
+            - listitem [ref=e2072]:
+              - img "Listing photo." [ref=e2074]
+            - listitem [ref=e2075]:
+              - img "Listing photo." [ref=e2077]
+            - listitem [ref=e2078]:
+              - img "Listing photo." [ref=e2080]
+            - listitem [ref=e2081]:
+              - img "Listing photo." [ref=e2083]
+            - listitem [ref=e2084]:
+              - img "Listing photo." [ref=e2086]
+            - listitem [ref=e2087]:
+              - img "Listing photo." [ref=e2089]
+            - listitem [ref=e2090]:
+              - img "Listing photo." [ref=e2092]
+            - listitem [ref=e2093]:
+              - img "Listing photo." [ref=e2095]
+        - button "Media Gallery." [ref=e2097] [cursor=pointer]:
+          - img [ref=e2098]
+        - generic [ref=e2100]:
+          - button "Image 1 of 31, Listing photo.." [ref=e2101] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2102]
+          - button "Image 2 of 31, Listing photo.." [ref=e2103] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2104]
+          - button "Image 3 of 31, Listing photo.." [ref=e2105] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2106]
+          - button "Image 4 of 31, Listing photo.." [ref=e2107] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2108]
+          - button "Image 5 of 31, Listing photo.." [ref=e2109] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2110]
+          - button "Image 6 of 31, Listing photo.." [ref=e2111] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2112]
+          - button "Image 7 of 31, Listing photo.." [ref=e2113] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2114]
+          - button "Image 8 of 31, Listing photo.." [ref=e2115] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2116]
+          - button "Image 9 of 31, Listing photo.." [ref=e2117] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2118]
+          - button "Image 10 of 31, Listing photo.." [ref=e2119] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2120]
+          - button "Image 11 of 31, Listing photo.." [ref=e2121] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2122]
+          - button "Image 12 of 31, Listing photo.." [ref=e2123] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2124]
+          - button "Image 13 of 31, Listing photo.." [ref=e2125] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2126]
+          - button "Image 14 of 31, Listing photo.." [ref=e2127] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2128]
+          - button "Image 15 of 31, Listing photo.." [ref=e2129] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2130]
+          - button "Image 16 of 31, Listing photo.." [ref=e2131] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2132]
+          - button "Image 17 of 31, Listing photo.." [ref=e2133] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2134]
+          - button "Image 18 of 31, Listing photo.." [ref=e2135] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2136]
+          - button "Image 19 of 31, Listing photo.." [ref=e2137] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2138]
+          - button "Image 20 of 31, Listing photo.." [ref=e2139] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2140]
+          - button "Image 21 of 31, Listing photo.." [ref=e2141] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2142]
+          - button "Image 22 of 31, Listing photo.." [ref=e2143] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2144]
+          - button "Image 23 of 31, Listing photo.." [ref=e2145] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2146]
+          - button "Image 24 of 31, Listing photo.." [ref=e2147] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2148]
+          - button "Image 25 of 31, Listing photo.." [ref=e2149] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2150]
+          - button "Image 26 of 31, Listing photo.." [ref=e2151] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2152]
+          - button "Image 27 of 31, Listing photo.." [ref=e2153] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2154]
+          - button "Image 28 of 31, Listing photo.." [ref=e2155] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2156]
+          - button "Image 29 of 31, Listing photo.." [ref=e2157] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2158]
+          - button "Image 30 of 31, Listing photo.." [ref=e2159] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2160]
+          - button "Image 31 of 31, Listing photo.." [ref=e2161] [cursor=pointer]:
+            - img "Listing photo.." [ref=e2162]
+      - group [ref=e2164]:
+        - button "Photos" [ref=e2165] [cursor=pointer]
+        - separator [ref=e2166]
+        - button "Map" [ref=e2167] [cursor=pointer]
+        - separator [ref=e2168]
+        - button "Docs" [ref=e2169] [cursor=pointer]
+      - generic [ref=e2170]:
+        - generic [ref=e2171]:
+          - generic [ref=e2172]:
+            - heading "7022 N 88th Avenue" [level=5] [ref=e2173]
+            - generic [ref=e2174]: Omaha, NE 68122
+            - generic [ref=e2175]: RESIDENTIAL
+            - generic [ref=e2176]: ACTIVE
+          - heading "$270,000" [level=5] [ref=e2178]
+        - separator [ref=e2182]
+        - generic [ref=e2183]:
+          - generic [ref=e2184]:
+            - generic [ref=e2185]:
+              - generic [ref=e2186]:
+                - generic [ref=e2187]: MLS Number
+                - paragraph [ref=e2188]: "22612200"
+              - generic [ref=e2189]:
+                - generic [ref=e2190]: Bedrooms
+                - generic [ref=e2191]:
+                  - paragraph [ref=e2192]: "3"
+                  - img "Bed" [ref=e2193]
+              - generic [ref=e2195]:
+                - generic [ref=e2196]: Bathrooms
+                - generic [ref=e2197]:
+                  - paragraph [ref=e2198]: "2"
+                  - img "Bath" [ref=e2199]
+              - generic [ref=e2201]:
+                - generic [ref=e2202]: Days on Market
+                - paragraph [ref=e2203]: 9 days
+              - generic [ref=e2204]:
+                - generic [ref=e2205]: AGSQFT
+                - paragraph [ref=e2206]: 1,268
+              - generic [ref=e2207]:
+                - generic [ref=e2208]: Total Finished SqFt
+                - paragraph [ref=e2209]: 1,466
+            - generic [ref=e2213]:
+              - generic [ref=e2214]: Public Remarks
+              - generic [ref=e2215]: Showings start May 7th. Beautifully updated home in Glenmoor subdivision featuring three spacious bedrooms and two full bathrooms. The bright, functional kitchen includes a newer refrigerator and oven (2025), making it move-in ready for its next owner. Washer and dryer are included for added convenience. Step outside to a fully fenced backyard perfect for pets, play, or entertaining. Enjoy a prime location just an 8-minute walk to Turnbridge Park and only a 3-minute drive to Lake Cunningham, offering easy access to recreation and outdoor activities. Don't miss this wonderful opportunity to own a well-maintained home in a fantastic location!
+          - list [ref=e2217]:
+            - 'link "CRS Data: Property Report" [ref=e2867] [cursor=pointer]':
+              - /url: //gprmls.crsdata.com/login/mls/?sc=BKFS&mls=gprmls&user=967416&ac=1f760af2cc912b48a31b6c01bea5b259&pid=1147265216&county=Douglas&cmd=rpt&state=Nebraska&addno=7022&addname=88th&addunit=&listingid=22612200
+              - generic [ref=e2869]: "CRS Data: Property Report"
+              - img [ref=e2871]
+            - link "MarketStats" [ref=e2873] [cursor=pointer]:
+              - /url: //gpmls.stats.showingtime.com/l/interactive?user=10031&hash=be61250fe7170f29221287b520760726&time=2026051322&ListingID=22612200&locationType=zipcode&locationName=68122
+              - generic [ref=e2875]: MarketStats
+              - img [ref=e2877]
+            - link "RPR Market Trends" [ref=e2879] [cursor=pointer]:
+              - /url: //www.narrpr.com/deep-link?query=68122&propertymode=Residential&action=MarketTrends&detailstab=Summary&ssocode=NEGPR-n&orgid=NEGPR-n&cbcode=NEGPR-n&vendorid=bkparagonconnect&utm_source=bkparagonconnect&utm_medium=deep-link&utm_campaign=ListingDetails
+              - generic [ref=e2881]: RPR Market Trends
+              - img [ref=e2883]
+            - link "RPR Property Details" [ref=e2885] [cursor=pointer]:
+              - /url: //www.narrpr.com/deep-link?query=7022+N+88th+Avenue%2C+Omaha%2C+NE%2C+68122&listingid=22612200&propertymode=Residential&action=PropertyDetails&detailstab=Summary&ssocode=NEGPR-n&orgid=NEGPR-n&cbcode=NEGPR-n&vendorid=bkparagonconnect&utm_source=bkparagonconnect&utm_medium=deep-link&utm_campaign=ListingDetails
+              - generic [ref=e2887]: RPR Property Details
+              - img [ref=e2889]
+            - link "Supra Keybox Settings Report" [ref=e2891] [cursor=pointer]:
+              - /url: https://mlsi.suprakim.com/MLSIWebSite/Reports/KeyBoxSettings.aspx?sid=cd25f68b-1585-40d3-89ce-39869a085999&ListingID=22612200
+              - generic [ref=e2893]: Supra Keybox Settings Report
+              - img [ref=e2895]
+      - generic [ref=e2218]:
+        - heading "Property Details Caret" [level=3] [ref=e2219]:
+          - button "Property Details Caret" [expanded] [ref=e2220] [cursor=pointer]:
+            - paragraph [ref=e2222]: Property Details
+            - img "Caret" [ref=e2224]
+        - region [ref=e2229]:
+          - generic [ref=e2233]:
+            - generic [ref=e2234]:
+              - paragraph [ref=e2236]: All Fields Detail
+              - generic [ref=e2238]:
+                - generic [ref=e2240]: "MLS #"
+                - generic [ref=e2242]: "22612200"
+                - generic [ref=e2244]: Status
+                - generic [ref=e2246]: Active
+                - generic [ref=e2248]: Class
+                - generic [ref=e2250]: RESIDENTIAL
+                - generic [ref=e2252]: Listing Price
+                - generic [ref=e2254]: $270,000
+                - generic [ref=e2256]: Property Subtype
+                - generic [ref=e2258]: Single Family Residence
+                - generic [ref=e2260]: Address
+                - generic [ref=e2262]: 7022 N 88th Avenue
+                - generic [ref=e2264]: County
+                - generic [ref=e2266]: Douglas
+                - generic [ref=e2268]: City
+                - generic [ref=e2270]: Omaha
+                - generic [ref=e2272]: Zip
+                - generic [ref=e2274]: "68122"
+                - generic [ref=e2276]: State
+                - generic [ref=e2278]: Nebraska
+            - generic [ref=e2279]:
+              - paragraph [ref=e2281]: General
+              - generic [ref=e2283]:
+                - generic [ref=e2285]: VOW Include
+                - generic [ref=e2287]: "Yes"
+                - generic [ref=e2289]: VOW Address
+                - generic [ref=e2291]: "Yes"
+                - generic [ref=e2293]: VOW Comment
+                - generic [ref=e2295]: "Yes"
+                - generic [ref=e2297]: VOW AVM
+                - generic [ref=e2299]: "Yes"
+                - generic [ref=e2301]: Parcel Number
+                - generic [ref=e2303]: "1147265216"
+                - generic [ref=e2305]: Listing Agent
+                - generic [ref=e2307]: Doug Hartman
+                - generic [ref=e2309]: Listing Office
+                - generic [ref=e2311]: NP Dodge RE Sales Inc 86Dodge - 770
+                - generic [ref=e2313]: Subdivision
+                - generic [ref=e2315]: Glenmoor
+                - generic [ref=e2317]: List Date
+                - generic [ref=e2319]: 05/04/2026
+                - generic [ref=e2321]: Occupant Type
+                - generic [ref=e2323]: Owner
+                - generic [ref=e2325]: SID Y/N
+                - generic [ref=e2327]: "Yes"
+                - generic [ref=e2329]: "SID #"
+                - generic [ref=e2331]: "530"
+                - generic [ref=e2333]: HOA (Y/N)
+                - generic [ref=e2335]: "Yes"
+                - generic [ref=e2337]: HOA Fee
+                - generic [ref=e2339]: $126.00
+                - generic [ref=e2341]: HOA Fee Term
+                - generic [ref=e2343]: Annually
+                - generic [ref=e2345]: Directions to Property
+                - generic [ref=e2347]: From 80 head North on 680. Take exit 133 and head east on Blair High Rd. Then head north on Sorensen pkwy and take a left on Ida. Next take a right on N 90th Street then take another right on Read Street. Next take a right on N 88th Avenue.
+                - generic [ref=e2349]: Lot Dimension Source
+                - generic [ref=e2351]: Assessor
+                - generic [ref=e2353]: Lot Dimensions
+                - generic [ref=e2355]: 52.6 x 101
+                - generic [ref=e2357]: Total Acres
+                - generic [ref=e2359]: "0.123"
+                - generic [ref=e2361]: Bedrooms
+                - generic [ref=e2363]: "3"
+                - generic [ref=e2365]: Bedrooms Above Grade
+                - generic [ref=e2367]: "3"
+                - generic [ref=e2369]: Bathrooms
+                - generic [ref=e2371]: "2"
+                - generic [ref=e2373]: "# of Fireplaces"
+                - generic [ref=e2375]: "0"
+                - generic [ref=e2377]: Garage Spaces
+                - generic [ref=e2379]: "2"
+                - generic [ref=e2381]: Square Footage Source
+                - generic [ref=e2383]: Other
+                - generic [ref=e2385]: Main Floor SqFt
+                - generic [ref=e2387]: 1,268
+                - generic [ref=e2389]: 2nd Floor SqFt
+                - generic [ref=e2391]: "0"
+                - generic [ref=e2393]: 3rd Floor SqFt
+                - generic [ref=e2395]: "0"
+                - generic [ref=e2397]: 4th Floor SqFt
+                - generic [ref=e2399]: "0"
+                - generic [ref=e2401]: Basement
+                - generic [ref=e2403]: "Yes"
+                - generic [ref=e2405]: Finished Basement
+                - generic [ref=e2407]: "198"
+                - generic [ref=e2409]: Total Basement SqFt
+                - generic [ref=e2411]: "128"
+                - generic [ref=e2413]: Total Finished Below Grade
+                - generic [ref=e2415]: "198"
+                - generic [ref=e2417]: Above Grade SQFT
+                - generic [ref=e2419]: 1,268
+                - generic [ref=e2421]: Total Finished SqFt
+                - generic [ref=e2423]: 1,466
+                - generic [ref=e2425]: Price Per SQFT AG
+                - generic [ref=e2427]: $212.93
+                - generic [ref=e2429]: Price per SQFT Total
+                - generic [ref=e2431]: "184.17"
+                - generic [ref=e2433]: Property Attached Y/N
+                - generic [ref=e2435]: "No"
+                - generic [ref=e2437]: Tax Amount
+                - generic [ref=e2439]: $3,830.06
+                - generic [ref=e2441]: Taxes (Partial/Full)
+                - generic [ref=e2443]: Full
+                - generic [ref=e2445]: Tax Year
+                - generic [ref=e2447]: "2025"
+                - generic [ref=e2449]: Year Built
+                - generic [ref=e2451]: "2008"
+                - generic [ref=e2453]: New Construction
+                - generic [ref=e2455]: Not New and NOT a Model
+                - generic [ref=e2457]: Lot Size Range
+                - generic [ref=e2459]: Up to 1/4 Acre.
+                - generic [ref=e2461]: School District
+                - link "Omaha" [ref=e2464] [cursor=pointer]:
+                  - /url: http://www.ops.org
+                - generic [ref=e2466]: Grade School
+                - generic [ref=e2468]: Boyd
+                - generic [ref=e2470]: Jr. High School
+                - generic [ref=e2472]: Morton
+                - generic [ref=e2474]: High School
+                - generic [ref=e2476]: Northwest
+                - generic [ref=e2478]: Style
+                - generic [ref=e2480]: Multi-Level
+                - generic [ref=e2482]: Agreement Type
+                - generic [ref=e2484]: Exclusive Right to Sell
+                - generic [ref=e2486]: Non Standard Form
+                - generic [ref=e2488]: "No"
+                - generic [ref=e2490]: Agent Has Equity
+                - generic [ref=e2492]: "No"
+                - generic [ref=e2494]: Living Room Size
+                - generic [ref=e2496]: 13.31 x 10.51
+                - generic [ref=e2498]: Living Room Level
+                - generic [ref=e2500]: Lower (Below Grade)
+                - generic [ref=e2502]: Kitchen Size
+                - generic [ref=e2504]: 10 x 8.64
+                - generic [ref=e2506]: Family Room Size
+                - generic [ref=e2508]: 20.40 x 10.62
+                - generic [ref=e2510]: Primary Bedroom Size
+                - generic [ref=e2512]: 12.34 x 11.98
+                - generic [ref=e2514]: Primary Bedroom Level
+                - generic [ref=e2516]: 2nd Floor
+                - generic [ref=e2518]: "Bedroom #2 Size"
+                - generic [ref=e2520]: 11.53 x 9
+                - generic [ref=e2522]: "Bedroom #2 Level"
+                - generic [ref=e2524]: 2nd Floor
+                - generic [ref=e2526]: "Bedroom #3 Size"
+                - generic [ref=e2528]: 11.50 x 9.52
+                - generic [ref=e2530]: "Bedroom #3 Level"
+                - generic [ref=e2532]: 2nd Floor
+                - generic [ref=e2534]: Laundry Room Level
+                - generic [ref=e2536]: Basement
+                - generic [ref=e2538]: 3rd Floor Baths
+                - generic [ref=e2540]: ////
+                - generic [ref=e2542]: 2nd Floor Baths
+                - generic [ref=e2544]: 1/1///
+                - generic [ref=e2546]: 2nd Floor Full Baths
+                - generic [ref=e2548]: "1"
+                - generic [ref=e2550]: 2nd Floor 3/4 Baths
+                - generic [ref=e2552]: "1"
+                - generic [ref=e2554]: Main Floor Baths
+                - generic [ref=e2556]: 0/0/0/0/0
+                - generic [ref=e2558]: Main Floor Full Baths
+                - generic [ref=e2560]: "0"
+                - generic [ref=e2562]: Main Floor 3/4 Baths
+                - generic [ref=e2564]: "0"
+                - generic [ref=e2566]: Main Floor 1/2 Baths
+                - generic [ref=e2568]: "0"
+                - generic [ref=e2570]: Main Floor 1/4 Baths
+                - generic [ref=e2572]: "0"
+                - generic [ref=e2574]: Main Floor Rough-In
+                - generic [ref=e2576]: "0"
+                - generic [ref=e2578]: Below Grade Baths
+                - generic [ref=e2580]: 0/0/0/0/0
+                - generic [ref=e2582]: Below Grade Full Baths
+                - generic [ref=e2584]: "0"
+                - generic [ref=e2586]: Below Grade 3/4 Baths
+                - generic [ref=e2588]: "0"
+                - generic [ref=e2590]: Below Grade 1/2 Baths
+                - generic [ref=e2592]: "0"
+                - generic [ref=e2594]: Below Grade 1/4 Baths
+                - generic [ref=e2596]: "0"
+                - generic [ref=e2598]: Below Grade Rough-In
+                - generic [ref=e2600]: "0"
+                - generic [ref=e2602]: Client Hit Count
+                - generic [ref=e2604]: "4"
+                - generic [ref=e2606]: Agent Hit Count
+                - generic [ref=e2608]: "77"
+                - generic [ref=e2610]: Branded Virtual Tour
+                - link "View Link" [ref=e2613] [cursor=pointer]:
+                  - /url: https://my.matterport.com/show/?m=km9ta8aPoML
+                - generic [ref=e2615]: Unbranded Virtual Tour
+                - link "View Link" [ref=e2618] [cursor=pointer]:
+                  - /url: https://my.matterport.com/show/?m=km9ta8aPoML&brand=0
+                - generic [ref=e2620]: REO (Bank, ETC, OWNED)Y/N
+                - generic [ref=e2622]: "NO"
+                - generic [ref=e2624]: IDX Include
+                - generic [ref=e2626]: "Yes"
+                - generic [ref=e2628]: Update Date
+                - generic [ref=e2630]: 05/09/2026
+                - generic [ref=e2632]: Status Date
+                - generic [ref=e2634]: 05/09/2026
+                - generic [ref=e2636]: HotSheet Date
+                - generic [ref=e2638]: 05/09/2026
+                - generic [ref=e2640]: Price Date
+                - generic [ref=e2642]: 05/04/2026
+                - generic [ref=e2644]: Input Date
+                - generic [ref=e2646]: 05/04/2026
+                - generic [ref=e2648]: General Date
+                - generic [ref=e2650]: 05/04/2026
+                - generic [ref=e2652]: Associated Document Count
+                - generic [ref=e2654]: "2"
+                - generic [ref=e2656]: Original Price
+                - generic [ref=e2658]: $270,000
+                - generic [ref=e2660]: Lock Box Provider
+                - generic [ref=e2662]: Supra
+                - generic [ref=e2664]: Showing Contact Type
+                - generic [ref=e2666]: Showing Service
+                - generic [ref=e2668]: Showing Phone Number
+                - generic [ref=e2670]: 402-397-5554
+            - generic [ref=e2671]:
+              - paragraph [ref=e2673]: Features
+              - generic [ref=e2675]:
+                - generic [ref=e2677]: LIVING ROOM DESC
+                - generic [ref=e2679]: Luxury Vinyl Plank
+                - generic [ref=e2681]: KITCHEN DESC
+                - generic [ref=e2683]: Luxury Vinyl Plank
+                - generic [ref=e2685]: FAMILY ROOM DESC
+                - generic [ref=e2687]: Wall/Wall Carpeting
+                - generic [ref=e2689]: PRIMARY BEDROOM DESC
+                - generic [ref=e2691]: Luxury Vinyl Plank
+                - generic [ref=e2693]: "BEDROOM #2 DESC"
+                - generic [ref=e2695]: Wall/Wall Carpeting
+                - generic [ref=e2697]: APPLIANCES INCLUDED
+                - generic [ref=e2699]: Dishwasher, Dryer, Microwave, Oven - No Cooktop, Range - Cooktop + Oven, Refrigerator, Washer
+                - generic [ref=e2701]: COOLING
+                - generic [ref=e2703]: Central Air
+                - generic [ref=e2705]: EXTERIOR FEATURES
+                - generic [ref=e2707]: Deck/Balcony
+                - generic [ref=e2709]: EXTERIOR
+                - generic [ref=e2711]: Vinyl Siding
+                - generic [ref=e2713]: FENCE
+                - generic [ref=e2715]: Full, Wood
+                - generic [ref=e2717]: GARAGE TYPE
+                - generic [ref=e2719]: Built-In
+                - generic [ref=e2721]: HEATING FUEL
+                - generic [ref=e2723]: Gas
+                - generic [ref=e2725]: HEATING TYPE
+                - generic [ref=e2727]: Forced Air
+                - generic [ref=e2729]: INTERIOR FEATURES
+                - generic [ref=e2731]: Security System
+                - generic [ref=e2733]: HOA INCLUDES
+                - generic [ref=e2735]: Common Area Maint.
+                - generic [ref=e2737]: LOT DESCRIPTION
+                - generic [ref=e2739]: In City, In Subdivision, Public Sidewalk
+                - generic [ref=e2741]: PRIMARY BATH TYPE
+                - generic [ref=e2743]: 3/4
+                - generic [ref=e2745]: OWNERSHIP TYPE
+                - generic [ref=e2747]: Fee Simple
+                - generic [ref=e2749]: ROOF TYPE
+                - generic [ref=e2751]: Composition
+                - generic [ref=e2753]: SEWER AND WATER
+                - generic [ref=e2755]: Public Sewer, Public Water
+                - generic [ref=e2757]: FINANCING TERMS ACCEPTED
+                - generic [ref=e2759]: Cash, Conventional, FHA, VA
+                - generic [ref=e2761]: BASEMENT TYPE
+                - generic [ref=e2763]: Partially Finished
+                - generic [ref=e2765]: FLOOR COVERINGS
+                - generic [ref=e2767]: Luxury Vinyl Plank
+                - generic [ref=e2769]: FOUNDATION DETAILS
+                - generic [ref=e2771]: Poured Concrete
+                - generic [ref=e2773]: PHOTOS PROVIDED BY
+                - generic [ref=e2775]: Agent, Photographer
+                - generic [ref=e2777]: UTILITIES AT SITE
+                - generic [ref=e2779]: Electric, Natural Gas, Sewer, Water
+            - generic [ref=e2780]:
+              - paragraph [ref=e2782]: Agent Remarks
+              - generic [ref=e2784]:
+                - generic [ref=e2786]: Agent Remarks
+                - generic [ref=e2788]: Showings start 5/7/2026. Appointment required, please call Showingtime or schedule online. For questions or contracts please text/call Doug at (402) 850-6268. Send contracts to doughartmanrealty@gmail.com
+            - generic [ref=e2789]:
+              - paragraph [ref=e2791]: Public Remarks
+              - generic [ref=e2793]:
+                - generic [ref=e2795]: Public Remarks
+                - generic [ref=e2797]: Showings start May 7th. Beautifully updated home in Glenmoor subdivision featuring three spacious bedrooms and two full bathrooms. The bright, functional kitchen includes a newer refrigerator and oven (2025), making it move-in ready for its next owner. Washer and dryer are included for added convenience. Step outside to a fully fenced backyard perfect for pets, play, or entertaining. Enjoy a prime location just an 8-minute walk to Turnbridge Park and only a 3-minute drive to Lake Cunningham, offering easy access to recreation and outdoor activities. Don't miss this wonderful opportunity to own a well-maintained home in a fantastic location!
+            - generic [ref=e2798]:
+              - paragraph [ref=e2800]: Showing Instructions
+              - generic [ref=e2802]:
+                - generic [ref=e2804]: Showing Instructions
+                - generic [ref=e2806]: Appointment required. Set up with Showingtime. Showings start 5/7/2026.
+            - button "Show More" [ref=e2810] [cursor=pointer]
+      - heading "Agent/Office Caret" [level=3] [ref=e2812]:
+        - button "Agent/Office Caret" [ref=e2813] [cursor=pointer]:
+          - paragraph [ref=e2815]: Agent/Office
+          - img "Caret" [ref=e2817]
+      - heading "Documents Caret" [level=3] [ref=e2820]:
+        - button "Documents Caret" [ref=e2821] [cursor=pointer]:
+          - paragraph [ref=e2823]: Documents
+          - img "Caret" [ref=e2825]
+      - heading "Property History Caret" [level=3] [ref=e2828]:
+        - button "Property History Caret" [ref=e2829] [cursor=pointer]:
+          - paragraph [ref=e2831]: Property History
+          - img "Caret" [ref=e2833]
+      - heading "Public Record Caret" [level=3] [ref=e2836]:
+        - button "Public Record Caret" [ref=e2837] [cursor=pointer]:
+          - paragraph [ref=e2839]: Public Record
+          - img "Caret" [ref=e2841]
+      - generic [ref=e2843]:
+        - heading "Mortgage Center Caret" [level=3] [ref=e2844]:
+          - button "Mortgage Center Caret" [ref=e2845] [cursor=pointer]:
+            - paragraph [ref=e2847]: Mortgage Center
+            - img "Caret" [ref=e2849]
+        - generic: Purchase Price of Home
+        - generic: Down Payment
+        - generic: Term (Yrs)
+        - generic: Interest Rate
+      - heading "Community Reports Caret" [level=3] [ref=e2852]:
+        - button "Community Reports Caret" [ref=e2853] [cursor=pointer]:
+          - paragraph [ref=e2855]: Community Reports
+          - img "Caret" [ref=e2857]
+      - paragraph [ref=e2860]: Information has not been verified, is not guaranteed, and is subject to change. Copyright© 2026 Great Plains Regional MLS. It is recommended that home buyers verify availability for school attendance areas and any other items of particular importance. Buyers should assume that all properties viewed have audio/visual surveillance devices in operation, both inside and outside the property. Conversations at the property should not be presumed to be confidential.
+    - button "Share" [ref=e2863] [cursor=pointer]:
+      - img "Share" [ref=e2865]

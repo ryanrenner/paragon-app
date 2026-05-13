@@ -1,0 +1,337 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e813]:
+      - generic [ref=e814]:
+        - button [ref=e883] [cursor=pointer]:
+          - img [ref=e818]
+        - generic [ref=e820]:
+          - heading [level=6] [ref=e884]: 1 Results
+          - heading [level=6] [ref=e885]: Residential (My Default)
+        - button [ref=e886] [cursor=pointer]:
+          - img [ref=e826]
+        - button [ref=e887] [cursor=pointer]:
+          - img [ref=e830]
+        - button [ref=e888] [cursor=pointer]:
+          - img [ref=e834]
+        - button [ref=e889] [cursor=pointer]:
+          - img [ref=e838]
+        - button [ref=e890] [cursor=pointer]:
+          - img [ref=e842]
+    - group [ref=e891] [cursor=pointer]:
+      - generic [ref=e849]:
+        - generic [ref=e850]:
+          - checkbox [ref=e892]:
+            - checkbox [ref=e893]
+            - img [ref=e894]
+          - link [ref=e895]
+          - button [ref=e896]:
+            - img [ref=e860]
+        - generic [ref=e867]:
+          - heading [level=6] [ref=e897]: 7022 N 88th Avenue
+          - generic [ref=e869]:
+            - paragraph [ref=e870]: Omaha, NE 68122
+            - paragraph [ref=e871]: MLS# 22612200 - Residential
+            - paragraph [ref=e872]: Total Finished SqFt - 1,466
+            - generic [ref=e898]: ACTIVE
+            - generic [ref=e876]: $270,000
+            - generic [ref=e877]:
+              - generic [ref=e900]:
+                - text: "Beds: 3"
+                - separator [ref=e879]
+              - generic [ref=e901]:
+                - text: "Baths: 2"
+                - separator [ref=e881]
+              - generic [ref=e902]: "DOM: 9"
+    - iframe [ref=e904]:
+      - alert [ref=f3e3]
+  - alert [ref=e737]: Search Results - Paragon Connect
+  - dialog [ref=e907]:
+    - banner [ref=e908]:
+      - generic [ref=e909]:
+        - button "back." [ref=e912] [cursor=pointer]:
+          - img [ref=e913]
+        - heading "#22612200" [level=6] [ref=e917]
+        - button "Find." [ref=e919] [cursor=pointer]:
+          - img [ref=e920]
+        - button "Recommend." [ref=e923] [cursor=pointer]:
+          - img [ref=e924]
+        - button "Add To Cart." [ref=e927] [cursor=pointer]:
+          - img [ref=e928]
+        - button "Match My Contacts." [ref=e931] [cursor=pointer]:
+          - img [ref=e932]
+        - button "Third Party Integrations." [ref=e935] [cursor=pointer]:
+          - img [ref=e936]
+        - button "More." [ref=e940] [cursor=pointer]:
+          - img [ref=e941]
+    - generic [ref=e944]:
+      - generic [ref=e945]:
+        - generic [ref=e946]:
+          - button "Previous image" [ref=e947] [cursor=pointer]:
+            - img [ref=e948]
+          - button "Next image" [ref=e950] [cursor=pointer]:
+            - img [ref=e951]
+          - list [ref=e956]:
+            - listitem [ref=e957]:
+              - img "Listing photo." [ref=e959]
+            - listitem [ref=e960]:
+              - img "Listing photo." [ref=e962]
+            - listitem [ref=e963]:
+              - img "Listing photo." [ref=e965]
+            - listitem [ref=e966]:
+              - img "Listing photo." [ref=e968]
+            - listitem [ref=e969]:
+              - img "Listing photo." [ref=e971]
+            - listitem [ref=e972]:
+              - img "Listing photo." [ref=e974]
+            - listitem [ref=e975]:
+              - img "Listing photo." [ref=e977]
+            - listitem [ref=e978]:
+              - img "Listing photo." [ref=e980]
+            - listitem [ref=e981]:
+              - img "Listing photo." [ref=e983]
+            - listitem [ref=e984]:
+              - img "Listing photo." [ref=e986]
+            - listitem [ref=e987]:
+              - img "Listing photo." [ref=e989]
+            - listitem [ref=e990]:
+              - img "Listing photo." [ref=e992]
+            - listitem [ref=e993]:
+              - img "Listing photo." [ref=e995]
+            - listitem [ref=e996]:
+              - img "Listing photo." [ref=e998]
+            - listitem [ref=e999]:
+              - img "Listing photo." [ref=e1001]
+            - listitem [ref=e1002]:
+              - img "Listing photo." [ref=e1004]
+            - listitem [ref=e1005]:
+              - img "Listing photo." [ref=e1007]
+            - listitem [ref=e1008]:
+              - img "Listing photo." [ref=e1010]
+            - listitem [ref=e1011]:
+              - img "Listing photo." [ref=e1013]
+            - listitem [ref=e1014]:
+              - img "Listing photo." [ref=e1016]
+            - listitem [ref=e1017]:
+              - img "Listing photo." [ref=e1019]
+            - listitem [ref=e1020]:
+              - img "Listing photo." [ref=e1022]
+            - listitem [ref=e1023]:
+              - img "Listing photo." [ref=e1025]
+            - listitem [ref=e1026]:
+              - img "Listing photo." [ref=e1028]
+            - listitem [ref=e1029]:
+              - img "Listing photo." [ref=e1031]
+            - listitem [ref=e1032]:
+              - img "Listing photo." [ref=e1034]
+            - listitem [ref=e1035]:
+              - img "Listing photo." [ref=e1037]
+            - listitem [ref=e1038]:
+              - img "Listing photo." [ref=e1040]
+            - listitem [ref=e1041]:
+              - img "Listing photo." [ref=e1043]
+            - listitem [ref=e1044]:
+              - img "Listing photo." [ref=e1046]
+            - listitem [ref=e1047]:
+              - img "Listing photo." [ref=e1049]
+            - listitem [ref=e1050]:
+              - img "Listing photo." [ref=e1052]
+            - listitem [ref=e1053]:
+              - img "Listing photo." [ref=e1055]
+        - button "Media Gallery." [ref=e1057] [cursor=pointer]:
+          - img [ref=e1058]
+        - generic [ref=e1060]:
+          - button "Image 1 of 31, Listing photo.." [ref=e1061] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1062]
+          - button "Image 2 of 31, Listing photo.." [ref=e1063] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1064]
+          - button "Image 3 of 31, Listing photo.." [ref=e1065] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1066]
+          - button "Image 4 of 31, Listing photo.." [ref=e1067] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1068]
+          - button "Image 5 of 31, Listing photo.." [ref=e1069] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1070]
+          - button "Image 6 of 31, Listing photo.." [ref=e1071] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1072]
+          - button "Image 7 of 31, Listing photo.." [ref=e1073] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1074]
+          - button "Image 8 of 31, Listing photo.." [ref=e1075] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1076]
+          - button "Image 9 of 31, Listing photo.." [ref=e1077] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1078]
+          - button "Image 10 of 31, Listing photo.." [ref=e1079] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1080]
+          - button "Image 11 of 31, Listing photo.." [ref=e1081] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1082]
+          - button "Image 12 of 31, Listing photo.." [ref=e1083] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1084]
+          - button "Image 13 of 31, Listing photo.." [ref=e1085] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1086]
+          - button "Image 14 of 31, Listing photo.." [ref=e1087] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1088]
+          - button "Image 15 of 31, Listing photo.." [ref=e1089] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1090]
+          - button "Image 16 of 31, Listing photo.." [ref=e1091] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1092]
+          - button "Image 17 of 31, Listing photo.." [ref=e1093] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1094]
+          - button "Image 18 of 31, Listing photo.." [ref=e1095] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1096]
+          - button "Image 19 of 31, Listing photo.." [ref=e1097] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1098]
+          - button "Image 20 of 31, Listing photo.." [ref=e1099] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1100]
+          - button "Image 21 of 31, Listing photo.." [ref=e1101] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1102]
+          - button "Image 22 of 31, Listing photo.." [ref=e1103] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1104]
+          - button "Image 23 of 31, Listing photo.." [ref=e1105] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1106]
+          - button "Image 24 of 31, Listing photo.." [ref=e1107] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1108]
+          - button "Image 25 of 31, Listing photo.." [ref=e1109] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1110]
+          - button "Image 26 of 31, Listing photo.." [ref=e1111] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1112]
+          - button "Image 27 of 31, Listing photo.." [ref=e1113] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1114]
+          - button "Image 28 of 31, Listing photo.." [ref=e1115] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1116]
+          - button "Image 29 of 31, Listing photo.." [ref=e1117] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1118]
+          - button "Image 30 of 31, Listing photo.." [ref=e1119] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1120]
+          - button "Image 31 of 31, Listing photo.." [ref=e1121] [cursor=pointer]:
+            - img "Listing photo.." [ref=e1122]
+      - group [ref=e1124]:
+        - button "Photos" [ref=e1125] [cursor=pointer]
+        - separator [ref=e1126]
+        - button "Map" [ref=e1127] [cursor=pointer]
+        - separator [ref=e1128]
+        - button "Docs" [ref=e1129] [cursor=pointer]
+      - generic [ref=e1130]:
+        - generic [ref=e1131]:
+          - generic [ref=e1132]:
+            - heading "7022 N 88th Avenue" [level=5] [ref=e1133]
+            - generic [ref=e1134]: Omaha, NE 68122
+            - generic [ref=e1135]: RESIDENTIAL
+            - generic [ref=e1136]: ACTIVE
+          - heading "$270,000" [level=5] [ref=e1138]
+        - separator [ref=e1142]
+        - generic [ref=e1143]:
+          - generic [ref=e1144]:
+            - generic [ref=e1145]:
+              - generic [ref=e1146]:
+                - generic [ref=e1147]: MLS Number
+                - paragraph [ref=e1148]: "22612200"
+              - generic [ref=e1149]:
+                - generic [ref=e1150]: Bedrooms
+                - generic [ref=e1151]:
+                  - paragraph [ref=e1152]: "3"
+                  - img "Bed" [ref=e1153]
+              - generic [ref=e1155]:
+                - generic [ref=e1156]: Bathrooms
+                - generic [ref=e1157]:
+                  - paragraph [ref=e1158]: "2"
+                  - img "Bath" [ref=e1159]
+              - generic [ref=e1161]:
+                - generic [ref=e1162]: Days on Market
+                - paragraph [ref=e1163]: 9 days
+              - generic [ref=e1164]:
+                - generic [ref=e1165]: AGSQFT
+                - paragraph [ref=e1166]: 1,268
+              - generic [ref=e1167]:
+                - generic [ref=e1168]: Total Finished SqFt
+                - paragraph [ref=e1169]: 1,466
+            - generic [ref=e1173]:
+              - generic [ref=e1174]: Public Remarks
+              - generic [ref=e1175]: Showings start May 7th. Beautifully updated home in Glenmoor subdivision featuring three spacious bedrooms and two full bathrooms. The bright, functional kitchen includes a newer refrigerator and oven (2025), making it move-in ready for its next owner. Washer and dryer are included for added convenience. Step outside to a fully fenced backyard perfect for pets, play, or entertaining. Enjoy a prime location just an 8-minute walk to Turnbridge Park and only a 3-minute drive to Lake Cunningham, offering easy access to recreation and outdoor activities. Don't miss this wonderful opportunity to own a well-maintained home in a fantastic location!
+          - list [ref=e1177]:
+            - 'link "CRS Data: Property Report" [ref=e1178] [cursor=pointer]':
+              - /url: //gprmls.crsdata.com/login/mls/?sc=BKFS&mls=gprmls&user=967416&ac=1f760af2cc912b48a31b6c01bea5b259&pid=1147265216&county=Douglas&cmd=rpt&state=Nebraska&addno=7022&addname=88th&addunit=&listingid=22612200
+              - generic [ref=e1180]: "CRS Data: Property Report"
+              - img [ref=e1182]
+            - link "MarketStats" [ref=e1184] [cursor=pointer]:
+              - /url: //gpmls.stats.showingtime.com/l/interactive?user=10031&hash=be61250fe7170f29221287b520760726&time=2026051322&ListingID=22612200&locationType=zipcode&locationName=68122
+              - generic [ref=e1186]: MarketStats
+              - img [ref=e1188]
+            - link "RPR Market Trends" [ref=e1190] [cursor=pointer]:
+              - /url: //www.narrpr.com/deep-link?query=68122&propertymode=Residential&action=MarketTrends&detailstab=Summary&ssocode=NEGPR-n&orgid=NEGPR-n&cbcode=NEGPR-n&vendorid=bkparagonconnect&utm_source=bkparagonconnect&utm_medium=deep-link&utm_campaign=ListingDetails
+              - generic [ref=e1192]: RPR Market Trends
+              - img [ref=e1194]
+            - link "RPR Property Details" [ref=e1196] [cursor=pointer]:
+              - /url: //www.narrpr.com/deep-link?query=7022+N+88th+Avenue%2C+Omaha%2C+NE%2C+68122&listingid=22612200&propertymode=Residential&action=PropertyDetails&detailstab=Summary&ssocode=NEGPR-n&orgid=NEGPR-n&cbcode=NEGPR-n&vendorid=bkparagonconnect&utm_source=bkparagonconnect&utm_medium=deep-link&utm_campaign=ListingDetails
+              - generic [ref=e1198]: RPR Property Details
+              - img [ref=e1200]
+            - link "Supra Keybox Settings Report" [ref=e1202] [cursor=pointer]:
+              - /url: https://mlsi.suprakim.com/MLSIWebSite/Reports/KeyBoxSettings.aspx?sid=e10d0ebc-898e-4d60-80d0-75a57e6dc9f7&ListingID=22612200
+              - generic [ref=e1204]: Supra Keybox Settings Report
+              - img [ref=e1206]
+      - heading "Property Details Caret" [level=3] [ref=e1209]:
+        - button "Property Details Caret" [ref=e1210] [cursor=pointer]:
+          - paragraph [ref=e1212]: Property Details
+          - img "Caret" [ref=e1214]
+      - heading "Agent/Office Caret" [level=3] [ref=e1802]:
+        - button "Agent/Office Caret" [ref=e1803] [cursor=pointer]:
+          - paragraph [ref=e1805]: Agent/Office
+          - img "Caret" [ref=e1807]
+      - generic [ref=e1809]:
+        - heading "Documents Caret" [level=3] [ref=e1810]:
+          - button "Documents Caret" [expanded] [active] [ref=e1811] [cursor=pointer]:
+            - paragraph [ref=e1813]: Documents
+            - img "Caret" [ref=e1815]
+        - region [ref=e1860]:
+          - generic [ref=e1862]:
+            - generic [ref=e1863]:
+              - paragraph [ref=e1864]: PDF Documents
+              - generic [ref=e1865] [cursor=pointer]:
+                - img "Print" [ref=e1866]
+                - text: PRINT PDF FILES
+            - generic [ref=e1868]:
+              - list [ref=e1870]:
+                - listitem [ref=e1871]:
+                  - generic [ref=e1872] [cursor=pointer]:
+                    - img "Pdf" [ref=e1874]
+                    - generic [ref=e1876]:
+                      - paragraph [ref=e1878]: Covenants
+                      - generic [ref=e1879]:
+                        - text: 5.75 MB
+                        - generic [ref=e1880]:
+                          - img [ref=e1881]
+                          - generic [ref=e1883]: Added 05/04/2026
+                        - generic [ref=e1885]: Private
+              - list [ref=e1887]:
+                - listitem [ref=e1888]:
+                  - generic [ref=e1889] [cursor=pointer]:
+                    - img "Pdf" [ref=e1891]
+                    - generic [ref=e1893]:
+                      - paragraph [ref=e1895]: SPCDS
+                      - generic [ref=e1896]:
+                        - text: 652.46 KB
+                        - generic [ref=e1897]:
+                          - img [ref=e1898]
+                          - generic [ref=e1900]: Added 05/04/2026
+                        - generic [ref=e1902]: Private
+      - heading "Property History Caret" [level=3] [ref=e1818]:
+        - button "Property History Caret" [ref=e1819] [cursor=pointer]:
+          - paragraph [ref=e1821]: Property History
+          - img "Caret" [ref=e1823]
+      - heading "Public Record Caret" [level=3] [ref=e1826]:
+        - button "Public Record Caret" [ref=e1827] [cursor=pointer]:
+          - paragraph [ref=e1829]: Public Record
+          - img "Caret" [ref=e1831]
+      - generic [ref=e1833]:
+        - heading "Mortgage Center Caret" [level=3] [ref=e1834]:
+          - button "Mortgage Center Caret" [ref=e1835] [cursor=pointer]:
+            - paragraph [ref=e1837]: Mortgage Center
+            - img "Caret" [ref=e1839]
+        - generic: Purchase Price of Home
+        - generic: Down Payment
+        - generic: Term (Yrs)
+        - generic: Interest Rate
+      - heading "Community Reports Caret" [level=3] [ref=e1842]:
+        - button "Community Reports Caret" [ref=e1843] [cursor=pointer]:
+          - paragraph [ref=e1845]: Community Reports
+          - img "Caret" [ref=e1847]
+      - paragraph [ref=e1850]: Information has not been verified, is not guaranteed, and is subject to change. Copyright© 2026 Great Plains Regional MLS. It is recommended that home buyers verify availability for school attendance areas and any other items of particular importance. Buyers should assume that all properties viewed have audio/visual surveillance devices in operation, both inside and outside the property. Conversations at the property should not be presumed to be confidential.
+    - button "Share" [ref=e1853] [cursor=pointer]:
+      - img "Share" [ref=e1855]

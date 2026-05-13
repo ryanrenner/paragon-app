@@ -1,0 +1,46 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e813]:
+      - generic [ref=e814]:
+        - button "menu." [ref=e1903] [cursor=pointer]:
+          - img [ref=e818]
+        - generic [ref=e820]:
+          - heading "1 Results" [level=6] [ref=e1904]
+          - heading "Residential (My Default)" [level=6] [ref=e1905]
+        - button "Views." [ref=e1906] [cursor=pointer]:
+          - img [ref=e826]
+        - button "Filter." [ref=e1907] [cursor=pointer]:
+          - img [ref=e830]
+        - button "Save Search." [ref=e1908] [cursor=pointer]:
+          - img [ref=e834]
+        - button "My Saved Searches." [ref=e1909] [cursor=pointer]:
+          - img [ref=e838]
+        - button "Sort." [ref=e1910] [cursor=pointer]:
+          - img [ref=e842]
+    - group "7022 N 88th Avenue." [ref=e1911] [cursor=pointer]:
+      - generic [active] [ref=e849]:
+        - generic [ref=e850]:
+          - checkbox "7022 N 88th Avenue." [ref=e1912]:
+            - checkbox "7022 N 88th Avenue." [ref=e1913]
+            - img "7022 N 88th Avenue." [ref=e1914]
+          - link "7022 N 88th Avenue." [ref=e1915]
+          - button "Media Gallery." [ref=e1916]:
+            - img [ref=e860]
+        - generic [ref=e867]:
+          - heading "7022 N 88th Avenue." [level=6] [ref=e1917]: 7022 N 88th Avenue
+          - generic [ref=e869]:
+            - paragraph [ref=e870]: Omaha, NE 68122
+            - paragraph [ref=e871]: MLS# 22612200 - Residential
+            - paragraph [ref=e872]: Total Finished SqFt - 1,466
+            - generic "ACTIVE. ." [ref=e1918]: ACTIVE
+            - generic "$270,000." [ref=e1919]:
+              - generic [ref=e876]: $270,000
+            - generic [ref=e877]:
+              - generic "3 Beds." [ref=e1920]:
+                - text: "Beds: 3"
+                - separator [ref=e879]
+              - generic "2 Baths." [ref=e1921]:
+                - text: "Baths: 2"
+                - separator [ref=e881]
+              - generic "9 DOM." [ref=e1922]: "DOM: 9"
+  - alert [ref=e737]: Search Results - Paragon Connect

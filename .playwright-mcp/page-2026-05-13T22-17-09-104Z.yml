@@ -1,0 +1,261 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e43]:
+    - generic [ref=e44]:
+      - generic [ref=e47]: Begin your exploration here
+      - generic [ref=e48]:
+        - button "Address, listings, people…" [ref=e49] [cursor=pointer]
+        - button "Near Me" [ref=e50] [cursor=pointer]:
+          - img "Near Me" [ref=e51]
+    - generic [ref=e55]:
+      - img "photo" [ref=e59] [cursor=pointer]
+      - generic [ref=e60]:
+        - heading "Welcome Ryan Renner" [level=6] [ref=e62]
+        - paragraph [ref=e64]: Better Homes and Gardens R.E.
+    - banner [ref=e65]:
+      - generic [ref=e66]:
+        - button "menu." [ref=e69] [cursor=pointer]:
+          - img [ref=e70]
+        - generic:
+          - generic:
+            - heading [level=6]
+          - heading [level=6]
+        - button "Customize Dashboard." [ref=e73] [cursor=pointer]:
+          - img [ref=e74]
+        - button "Messages." [ref=e77] [cursor=pointer]:
+          - img [ref=e78]
+    - generic [ref=e81]:
+      - tablist [ref=e84]:
+        - tab "My Dashboard" [selected] [ref=e85] [cursor=pointer]
+      - tabpanel [ref=e87]:
+        - generic [ref=e89]:
+          - generic [ref=e92]:
+            - generic [ref=e94]:
+              - paragraph [ref=e96]: Buyer Activity (7 Days)
+              - button "Refresh." [ref=e99] [cursor=pointer]:
+                - img [ref=e100]
+            - generic [ref=e105]:
+              - img [ref=e106]: ←
+              - generic [ref=e109]:
+                - generic [ref=e113]:
+                  - paragraph [ref=e116] [cursor=pointer]: EC
+                  - generic [ref=e117]:
+                    - heading "Elsie Crawford" [level=6] [ref=e118]
+                    - 'heading "Site Visit: 16/30 Days" [level=6] [ref=e119]'
+                - generic [ref=e123]:
+                  - generic [ref=e124] [cursor=pointer]:
+                    - paragraph [ref=e126]: HO
+                    - generic [ref=e127]: "1"
+                    - generic [ref=e128]: "1"
+                  - generic [ref=e129]:
+                    - heading "Hilal Olgun Kucuk" [level=6] [ref=e130]
+                    - 'heading "Site Visit: 136/30 Days" [level=6] [ref=e131]'
+                - generic [ref=e135]:
+                  - paragraph [ref=e138] [cursor=pointer]: MB
+                  - generic [ref=e139]:
+                    - heading "Michael Brich" [level=6] [ref=e140]
+                    - 'heading "Site Visit: 53/30 Days" [level=6] [ref=e141]'
+                - generic [ref=e145]:
+                  - paragraph [ref=e148] [cursor=pointer]: PC
+                  - generic [ref=e149]:
+                    - heading "Patrick Costello" [level=6] [ref=e150]
+                    - 'heading "Site Visit: 28/30 Days" [level=6] [ref=e151]'
+                - generic [ref=e155]:
+                  - generic [ref=e156] [cursor=pointer]:
+                    - paragraph [ref=e158]: HJ
+                    - generic [ref=e159]: "8"
+                    - generic [ref=e160]: "7"
+                  - generic [ref=e161]:
+                    - heading "Hanifah Jackson" [level=6] [ref=e162]
+                    - 'heading "Site Visit: 48/30 Days" [level=6] [ref=e163]'
+                - generic [ref=e167]:
+                  - paragraph [ref=e170] [cursor=pointer]: AL
+                  - generic [ref=e171]:
+                    - heading [level=6] [ref=e172]: Alan LaFollette
+                    - heading [level=6] [ref=e173]: "Site Visit: 17/30 Days"
+                - generic [ref=e177]:
+                  - paragraph [ref=e180] [cursor=pointer]: HB
+                  - generic [ref=e181]:
+                    - heading [level=6] [ref=e182]: Helen Bleicher
+                    - heading [level=6] [ref=e183]: "Site Visit: 3/30 Days"
+                - generic [ref=e187]:
+                  - paragraph [ref=e190] [cursor=pointer]: CR
+                  - generic [ref=e191]:
+                    - heading [level=6] [ref=e192]: Chris Rieber
+                    - heading [level=6] [ref=e193]: "Site Visit: 8/30 Days"
+                - generic [ref=e197]:
+                  - generic [ref=e198] [cursor=pointer]:
+                    - paragraph [ref=e200]: MB
+                    - generic [ref=e201]: "7"
+                    - generic [ref=e202]: "6"
+                    - generic [ref=e203]: "2"
+                  - generic [ref=e204]:
+                    - heading [level=6] [ref=e205]: Mandy Benes
+                    - heading [level=6] [ref=e206]: "Site Visit: 75/30 Days"
+                - generic [ref=e210]:
+                  - paragraph [ref=e213] [cursor=pointer]: AF
+                  - generic [ref=e214]:
+                    - heading [level=6] [ref=e215]: Amber Flynn
+                    - heading [level=6] [ref=e216]: "Site Visit: 39/30 Days"
+                - generic [ref=e220]:
+                  - paragraph [ref=e223] [cursor=pointer]: LJ
+                  - generic [ref=e224]:
+                    - heading [level=6] [ref=e225]: Lori Jackson
+                    - heading [level=6] [ref=e226]: "Site Visit: 3/30 Days"
+                - generic [ref=e230]:
+                  - paragraph [ref=e233] [cursor=pointer]: TB
+                  - generic [ref=e234]:
+                    - heading [level=6] [ref=e235]: Tonya Bolter
+                    - heading [level=6] [ref=e236]: "Site Visit: 2/30 Days"
+              - img [ref=e267] [cursor=pointer]: →
+            - generic [ref=e270]:
+              - generic:
+                - paragraph
+              - button "legend" [ref=e272] [cursor=pointer]
+          - generic [ref=e274]:
+            - paragraph [ref=e278]: Quick Actions
+            - list [ref=e280]:
+              - button "Listings Near Me" [ref=e281] [cursor=pointer]:
+                - generic [ref=e283]: Listings Near Me
+                - img [ref=e285]
+              - button "RESIDENTIAL Search" [ref=e287] [cursor=pointer]:
+                - generic [ref=e289]: RESIDENTIAL Search
+                - img [ref=e291]
+              - button "Your Saved Searches" [ref=e293] [cursor=pointer]:
+                - generic [ref=e295]: Your Saved Searches
+                - img [ref=e297]
+              - button "Your Listings Cart" [ref=e299] [cursor=pointer]:
+                - generic [ref=e301]: Your Listings Cart
+                - img [ref=e303]
+              - button "Edit your Listings" [ref=e305] [cursor=pointer]:
+                - generic [ref=e307]: Edit your Listings
+                - img [ref=e309]
+              - button "Create a Listing" [ref=e311] [cursor=pointer]:
+                - generic [ref=e313]: Create a Listing
+                - img [ref=e315]
+              - button "Create New CMA" [ref=e317] [cursor=pointer]:
+                - generic [ref=e319]: Create New CMA
+                - img [ref=e321]
+          - generic [ref=e326]:
+            - generic [ref=e328]:
+              - paragraph [ref=e330]: My Inventory (3 months)
+              - button "Refresh." [ref=e333] [cursor=pointer]:
+                - img [ref=e334]
+            - generic [ref=e337]:
+              - generic [ref=e338]:
+                - button "Donut chart" [ref=e340]:
+                  - img [ref=e341]
+                - button "Donut chart" [ref=e343]:
+                  - img [ref=e344]
+                - button "Donut chart" [ref=e346] [cursor=pointer]:
+                  - img [ref=e347]
+              - separator [ref=e349]
+              - list [ref=e351]:
+                - listitem [ref=e352]:
+                  - generic [ref=e354]: 7 Day Expire Alert
+                  - button "0" [ref=e355] [cursor=pointer]
+                - listitem [ref=e356]:
+                  - generic [ref=e358]: Sold
+                  - button "0" [ref=e359] [cursor=pointer]
+                - listitem [ref=e360]:
+                  - generic [ref=e362]: Pending Sales
+                  - button "0" [ref=e363] [cursor=pointer]
+                - listitem [ref=e364]:
+                  - generic [ref=e366]: Expired
+                  - button "0" [ref=e367] [cursor=pointer]
+                - listitem [ref=e368]:
+                  - generic [ref=e370]: Unpublished
+                  - button "0" [ref=e371] [cursor=pointer]
+            - generic [ref=e373]:
+              - generic:
+                - paragraph
+          - generic [ref=e375]:
+            - generic [ref=e377]:
+              - paragraph [ref=e379]: Unread Comments
+              - button "Refresh." [ref=e382] [cursor=pointer]:
+                - img [ref=e383]
+            - list [ref=e386]:
+              - button "HO Hilal Olgun Kucuk, 8 days ago Can we see this?" [ref=e387] [cursor=pointer]:
+                - generic [ref=e389]: HO
+                - generic [ref=e390]:
+                  - paragraph [ref=e391]: Hilal Olgun Kucuk, 8 days ago
+                  - paragraph [ref=e392]: Can we see this?
+              - button "HO Hilal Olgun Kucuk, 10 days ago And may be a tour for this one? This can be the last one …" [ref=e393] [cursor=pointer]:
+                - generic [ref=e395]: HO
+                - generic [ref=e396]:
+                  - paragraph [ref=e397]: Hilal Olgun Kucuk, 10 days ago
+                  - paragraph [ref=e398]: And may be a tour for this one? This can be the last one …
+              - button "HO Hilal Olgun Kucuk, 10 days ago Can you please arrange a tour for this one as well?" [ref=e399] [cursor=pointer]:
+                - generic [ref=e401]: HO
+                - generic [ref=e402]:
+                  - paragraph [ref=e403]: Hilal Olgun Kucuk, 10 days ago
+                  - paragraph [ref=e404]: Can you please arrange a tour for this one as well?
+              - button "HO Hilal Olgun Kucuk, 10 days ago Can you please arrange a tour for this one as well? On Wednesday?" [ref=e405] [cursor=pointer]:
+                - generic [ref=e407]: HO
+                - generic [ref=e408]:
+                  - paragraph [ref=e409]: Hilal Olgun Kucuk, 10 days ago
+                  - paragraph [ref=e410]: Can you please arrange a tour for this one as well? On Wednesday?
+            - generic [ref=e412]:
+              - generic:
+                - paragraph
+          - generic [ref=e414]:
+            - generic [ref=e416]:
+              - paragraph [ref=e418]: Hotsheet Alerts
+              - generic [ref=e419]:
+                - button "Refresh." [ref=e421] [cursor=pointer]:
+                  - img [ref=e422]
+                - button "More." [ref=e425] [cursor=pointer]:
+                  - img [ref=e426]
+            - list [ref=e429]:
+              - 'button "Updates All Results Daily Hotsheet Last Ran: 09/01/2025" [ref=e430] [cursor=pointer]':
+                - generic "Updates" [ref=e431]:
+                  - generic [ref=e432]: 99+
+                - generic "All Results" [ref=e433]:
+                  - generic [ref=e434]: All
+                - generic [ref=e435]:
+                  - paragraph [ref=e436]: Daily Hotsheet
+                  - paragraph [ref=e437]: "Last Ran: 09/01/2025"
+            - generic [ref=e439]:
+              - generic:
+                - paragraph
+          - generic [ref=e441]:
+            - paragraph [ref=e445]: Resource Links
+            - list [ref=e447]:
+              - button "icon GPRMLS News" [ref=e448] [cursor=pointer]:
+                - img "icon" [ref=e450]
+                - paragraph [ref=e452]: GPRMLS News
+              - 'button "icon CRS Data: Tax Search" [ref=e453] [cursor=pointer]':
+                - img "icon" [ref=e455]
+                - paragraph [ref=e457]: "CRS Data: Tax Search"
+              - button "icon FastStats - Omaha" [ref=e458] [cursor=pointer]:
+                - img "icon" [ref=e460]
+                - paragraph [ref=e462]: FastStats - Omaha
+              - button "icon FastStats - Lincoln" [ref=e463] [cursor=pointer]:
+                - img "icon" [ref=e465]
+                - paragraph [ref=e467]: FastStats - Lincoln
+              - button "icon FastStats - Regional" [ref=e468] [cursor=pointer]:
+                - img "icon" [ref=e470]
+                - paragraph [ref=e472]: FastStats - Regional
+              - button "icon InfoSparks" [ref=e473] [cursor=pointer]:
+                - img "icon" [ref=e475]
+                - paragraph [ref=e477]: InfoSparks
+              - button "icon RAL Affiliates" [ref=e478] [cursor=pointer]:
+                - img "icon" [ref=e480]
+                - paragraph [ref=e482]: RAL Affiliates
+              - button "icon OABR Affiliates" [ref=e483] [cursor=pointer]:
+                - img "icon" [ref=e485]
+                - paragraph [ref=e487]: OABR Affiliates
+              - button "icon RPR Homepage" [ref=e488] [cursor=pointer]:
+                - img "icon" [ref=e490]
+                - paragraph [ref=e492]: RPR Homepage
+              - button "icon RPR Market Trends" [ref=e493] [cursor=pointer]:
+                - img "icon" [ref=e495]
+                - paragraph [ref=e497]: RPR Market Trends
+              - button "icon ShowingTime Login" [ref=e498] [cursor=pointer]:
+                - img "icon" [ref=e500]
+                - paragraph [ref=e502]: ShowingTime Login
+            - generic [ref=e505]:
+              - button "View All" [ref=e506] [cursor=pointer]
+              - button "Expand Caret" [ref=e507] [cursor=pointer]:
+                - text: Expand
+                - img "Caret" [ref=e508]
+  - alert [ref=e8]: Dashboard - Paragon Connect

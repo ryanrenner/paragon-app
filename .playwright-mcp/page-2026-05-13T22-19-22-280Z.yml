@@ -1,0 +1,46 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e813]:
+      - generic [ref=e814]:
+        - button "menu." [ref=e817] [cursor=pointer]:
+          - img [ref=e818]
+        - generic [ref=e820]:
+          - heading "1 Results" [level=6] [ref=e822]
+          - heading "Residential (My Default)" [level=6] [ref=e823]
+        - button "Views." [ref=e825] [cursor=pointer]:
+          - img [ref=e826]
+        - button "Filter." [ref=e829] [cursor=pointer]:
+          - img [ref=e830]
+        - button "Save Search." [ref=e833] [cursor=pointer]:
+          - img [ref=e834]
+        - button "My Saved Searches." [ref=e837] [cursor=pointer]:
+          - img [ref=e838]
+        - button "Sort." [ref=e841] [cursor=pointer]:
+          - img [ref=e842]
+    - group "7022 N 88th Avenue." [ref=e848] [cursor=pointer]:
+      - generic [ref=e849]:
+        - generic [ref=e850]:
+          - checkbox "7022 N 88th Avenue." [ref=e852]:
+            - checkbox "7022 N 88th Avenue." [ref=e853]
+            - img "7022 N 88th Avenue." [ref=e854]
+          - link "7022 N 88th Avenue." [ref=e857]
+          - button "Media Gallery." [ref=e859]:
+            - img [ref=e860]
+        - generic [ref=e867]:
+          - heading "7022 N 88th Avenue." [level=6] [ref=e868]: 7022 N 88th Avenue
+          - generic [ref=e869]:
+            - paragraph [ref=e870]: Omaha, NE 68122
+            - paragraph [ref=e871]: MLS# 22612200 - Residential
+            - paragraph [ref=e872]: Total Finished SqFt - 1,466
+            - generic "ACTIVE. ." [ref=e873]: ACTIVE
+            - generic "$270,000." [ref=e874]:
+              - generic [ref=e876]: $270,000
+            - generic [ref=e877]:
+              - generic "3 Beds." [ref=e878]:
+                - text: "Beds: 3"
+                - separator [ref=e879]
+              - generic "2 Baths." [ref=e880]:
+                - text: "Baths: 2"
+                - separator [ref=e881]
+              - generic "9 DOM." [ref=e882]: "DOM: 9"
+  - alert [ref=e737]: Search Results - Paragon Connect

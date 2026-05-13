@@ -412,30 +412,31 @@ async function scrapeAllFields(page) {
 // --------------------------------------------------------------------------
 
 async function scrapeDocuments(page) {
-  // Expand the Documents accordion via a direct DOM click — Playwright's
-  // pointer-event simulation (even with force:true) is blocked by the MUI
-  // overlay on this page, but el.click() from page.evaluate always reaches
-  // the React handler.
-  const expanded = await page.evaluate(() => {
-    for (const el of document.querySelectorAll('p, span')) {
-      if ((el.textContent || '').trim() !== 'Documents') continue;
-      let btn = el.parentElement;
-      while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
-      if (!btn) continue;
-      if (btn.getAttribute('aria-expanded') !== 'true') btn.click();
-      return true; // accordion was found (may or may not have needed clicking)
-    }
-    return false; // no Documents accordion on this listing
+  // Expand the Documents accordion using Playwright's real pointer click.
+  // DOM-level el.click() via page.evaluate no longer triggers the MUI/React
+  // event handler in Paragon v26.8+. Additionally, accordion content uses
+  // unmountOnExit, so document links are absent from the DOM until expanded.
+  //
+  // Match the button by its .MuiAccordionSummary-content child text (new UI)
+  // or by a <p> child text (old UI), whichever is present.
+  const docAccordionBtn = page.locator('button').filter({
+    has: page.locator('.MuiAccordionSummary-content, p').filter({ hasText: /^Documents$/ }),
   });
-  if (!expanded) return [];
+
+  const btnCount = await docAccordionBtn.count().catch(() => 0);
+  if (btnCount === 0) return [];
+
+  const isAlreadyExpanded = await docAccordionBtn.first().getAttribute('aria-expanded').catch(() => null);
+  if (isAlreadyExpanded !== 'true') {
+    await docAccordionBtn.first().click({ force: true });
+  }
 
   // Wait for aria-expanded="true" to confirm React finished mounting content.
   await page.waitForFunction(() => {
-    for (const el of document.querySelectorAll('p, span')) {
-      if ((el.textContent || '').trim() !== 'Documents') continue;
-      let btn = el.parentElement;
-      while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
-      return btn && btn.getAttribute('aria-expanded') === 'true';
+    for (const btn of document.querySelectorAll('button[aria-expanded]')) {
+      const c = btn.querySelector('.MuiAccordionSummary-content') || btn.querySelector('p');
+      if (!c || c.textContent.trim() !== 'Documents') continue;
+      return btn.getAttribute('aria-expanded') === 'true';
     }
     return false;
   }, { timeout: 5000 }).catch(() => {});
@@ -498,30 +499,20 @@ async function scrapeDocuments(page) {
         .slice(0, 20),
     };
 
-    // Find the accordion by locating the <p> with exact text "Documents" — the
-    // same strategy scrapeHistory uses. Matching on button.textContent fails
-    // because the expand icon SVG has <title>Caret</title>, making the full
-    // textContent "DocumentsCaret" which doesn't satisfy /^Documents\b/.
+    // Find the Documents accordion button via .MuiAccordionSummary-content (new
+    // UI) or <p> child (old UI). The accordion root is btn → H3 → MuiPaper
+    // parent, which contains both the heading and the expanded collapse region.
+    // Avoid the old approach of walking up looking for <a> elements — content
+    // uses unmountOnExit so there are no <a> tags in the DOM when collapsed.
     let accordion = null;
-    for (const el of document.querySelectorAll('p, span')) {
-      if ((el.textContent || '').trim() === 'Documents') {
-        let p = el.parentElement;
-        // Walk up past MuiAccordion-heading (the H3 summary wrapper — content is
-        // NOT inside it). Stop at the first ancestor that isn't the heading and
-        // actually contains <a> elements (the full MuiPaper accordion container).
-        while (p) {
-          const cls = p.className || '';
-          if (!cls.includes('MuiAccordion-heading') && p.querySelectorAll('a').length > 0) break;
-          p = p.parentElement;
-        }
-        if (p) {
-          accordion = p;
-          diag.accordionFound = true;
-          const btn = p.querySelector('button');
-          diag.accordionExpanded = btn ? btn.getAttribute('aria-expanded') === 'true' : false;
-          break;
-        }
-      }
+    for (const btn of document.querySelectorAll('button[aria-expanded]')) {
+      const c = btn.querySelector('.MuiAccordionSummary-content') || btn.querySelector('p');
+      if (!c || c.textContent.trim() !== 'Documents') continue;
+      const h3 = btn.closest('h3') || btn.parentElement;
+      accordion = h3.parentElement;
+      diag.accordionFound = true;
+      diag.accordionExpanded = btn.getAttribute('aria-expanded') === 'true';
+      break;
     }
     if (!accordion) return { diag, metas: [] };
 
@@ -555,15 +546,10 @@ async function scrapeDocuments(page) {
   if (docMetas.length === 0) return [];
 
   // For each document: if it already has an href use it directly; otherwise
-  // click and capture the URL from the popup window Paragon opens.
+  // click via DOM evaluate (Playwright's .click() is blocked by the MUI
+  // overlay) and capture the new tab Paragon opens via context-level event.
   const results = [];
   const seenUrls = new Set();
-
-  // Re-resolve the accordion locator for clicking (Playwright can't reuse
-  // DOM handles returned from evaluate).
-  const accordionLocator = page.locator('[class*="MuiAccordion"]').filter({
-    hasText: /^Documents/,
-  }).first();
 
   for (const meta of docMetas) {
     if (meta.href && meta.href.toLowerCase().includes('associateddocs')) {
@@ -574,30 +560,49 @@ async function scrapeDocuments(page) {
       continue;
     }
 
-    const link = accordionLocator
-      .locator('a')
-      .filter({ has: page.locator('.MuiListItemAvatar-root') })
-      .nth(meta.idx);
-
     try {
-      // force: true bypasses the MUI overlay that intercepts pointer events
-      // in headless Chromium (same issue as expandAllFieldsDetail).
-      const [popup] = await Promise.all([
-        page.waitForEvent('popup', { timeout: 8000 }),
-        link.click({ force: true }),
+      // DOM-level click via evaluate works for <a> document links (unlike the
+      // accordion button which requires Playwright's real pointer click).
+      // context().waitForEvent('page') catches the new tab regardless of whether
+      // Paragon uses window.open(), target="_blank", etc.
+      const [newTab] = await Promise.all([
+        page.context().waitForEvent('page', { timeout: 10000 }),
+        page.evaluate((idx) => {
+          for (var btn of document.querySelectorAll('button[aria-expanded]')) {
+            var c = btn.querySelector('.MuiAccordionSummary-content') || btn.querySelector('p');
+            if (!c || c.textContent.trim() !== 'Documents') continue;
+            var h3 = btn.closest('h3') || btn.parentElement;
+            var accordion = h3.parentElement;
+            var links = Array.from(accordion.querySelectorAll('a')).filter(function(a) {
+              return a.querySelector('.MuiListItemAvatar-root');
+            });
+            if (links[idx]) links[idx].click();
+            return;
+          }
+        }, meta.idx),
       ]);
-      // Wait for the popup to finish navigating before reading its URL —
-      // window.open() can fire before the PDF URL is fully resolved.
-      await popup.waitForLoadState('domcontentloaded', { timeout: 8000 }).catch(() => {});
-      const url = popup.url();
-      console.log(`[docs] popup URL for "${meta.name}": ${url}`);
-      await popup.close();
-      if (url && url.toLowerCase().includes('associateddocs') && !seenUrls.has(url)) {
+      // Log every main-frame navigation in the new tab so we can see what
+      // URLs Paragon visits before settling on the document URL.
+      newTab.on('framenavigated', (frame) => {
+        if (frame === newTab.mainFrame()) {
+          console.log(`[docs] tab navigated: ${frame.url()}`);
+        }
+      });
+      // Paragon opens about:blank then navigates asynchronously via JS.
+      // waitForLoadState('domcontentloaded') resolves on the blank page
+      // before the real URL loads — wait explicitly for a real https URL.
+      await newTab.waitForURL((u) => /^https?:/.test(u), { timeout: 10000 }).catch(() => {});
+      const url = newTab.url();
+      console.log(`[docs] final tab URL for "${meta.name}": ${url}`);
+      await newTab.close();
+      if (/^https?:\/\//.test(url) && !seenUrls.has(url)) {
         seenUrls.add(url);
         results.push({ name: meta.name, url, size: meta.size, date_added: meta.date_added, visibility: meta.visibility });
+      } else if (url) {
+        console.log(`[docs] skipping URL (not https or duplicate): ${url}`);
       }
     } catch (err) {
-      console.log(`[docs] popup capture failed for "${meta.name}": ${err.message}`);
+      console.log(`[docs] capture failed for "${meta.name}": ${err.message}`);
     }
   }
 

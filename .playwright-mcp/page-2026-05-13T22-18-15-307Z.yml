@@ -1,0 +1,573 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - button "menu." [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+        - generic [ref=e10]:
+          - heading [level=6] [ref=e12]:
+            - progressbar [ref=e13]:
+              - img [ref=e14]
+          - heading "Residential (My Default)" [level=6] [ref=e16]
+        - button "Save." [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+        - button "Find Fields." [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Criteria Summary." [ref=e26] [cursor=pointer]:
+          - img [ref=e27]
+        - button "My Saved Searches." [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+        - button "Last 5 Searches." [ref=e34] [cursor=pointer]:
+          - img [ref=e35]
+        - button "More." [ref=e38] [cursor=pointer]:
+          - img [ref=e39]
+    - button "Search" [ref=e44] [cursor=pointer]:
+      - generic [ref=e45]: Search
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - heading "Primary Criteria Customize Primary Criteria. Caret" [level=3] [ref=e49]:
+          - button "Primary Criteria Customize Primary Criteria. Caret" [expanded] [ref=e50] [cursor=pointer]:
+            - generic [ref=e53]:
+              - paragraph [ref=e55]: Primary Criteria
+              - button "Customize Primary Criteria." [ref=e58]:
+                - img [ref=e59]
+            - img "Caret" [ref=e62]
+        - region [ref=e67]:
+          - generic [ref=e70]:
+            - generic [ref=e73]:
+              - generic: Search By Map
+              - generic [ref=e74]:
+                - combobox "Search By Map" [disabled] [ref=e75]
+                - button "Search By Map." [ref=e78] [cursor=pointer]:
+                  - img [ref=e79]
+                - group:
+                  - generic: Search By Map
+              - paragraph
+            - generic [ref=e85]:
+              - generic [ref=e86]: Status
+              - generic [ref=e87]:
+                - button "Active Remove option." [ref=e88]:
+                  - generic [ref=e89]: Active
+                  - button "Remove option." [ref=e91] [cursor=pointer]:
+                    - img [ref=e92]
+                - button "New Remove option." [ref=e94]:
+                  - generic [ref=e95]: New
+                  - button "Remove option." [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                - button "Extended Remove option." [ref=e100]:
+                  - generic [ref=e101]: Extended
+                  - button "Remove option." [ref=e103] [cursor=pointer]:
+                    - img [ref=e104]
+                - button "Back On Market Remove option." [ref=e106]:
+                  - generic [ref=e107]: Back On Market
+                  - button "Remove option." [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                - generic [ref=e112]: "+5"
+                - combobox "Status" [ref=e113]
+                - generic [ref=e114]:
+                  - button "Advanced Options." [ref=e117] [cursor=pointer]:
+                    - img [ref=e118]
+                  - button "Open" [ref=e120] [cursor=pointer]:
+                    - img "Lookup" [ref=e121]
+                - group:
+                  - generic: Status
+              - paragraph [ref=e123]: Equals
+            - generic [ref=e125]:
+              - generic: Price
+              - generic [ref=e126]:
+                - generic [ref=e128]:
+                  - textbox "min" [ref=e132]
+                  - textbox "max" [ref=e136]
+                - group:
+                  - generic: Price
+            - generic [ref=e139]:
+              - generic: Property Subtype
+              - generic [ref=e140]:
+                - combobox "Property Subtype" [ref=e141]
+                - generic [ref=e142]:
+                  - button "Advanced Options." [ref=e145] [cursor=pointer]:
+                    - img [ref=e146]
+                  - button "Open" [ref=e148] [cursor=pointer]:
+                    - img "Lookup" [ref=e149]
+                - group:
+                  - generic: Property Subtype
+              - paragraph [ref=e151]: Equals
+            - generic [ref=e154]:
+              - generic: Property Attached Y/N
+              - generic [ref=e155]:
+                - combobox "Property Attached Y/N" [ref=e156]
+                - generic [ref=e157]:
+                  - button "Advanced Options." [ref=e160] [cursor=pointer]:
+                    - img [ref=e161]
+                  - button "Open" [ref=e163] [cursor=pointer]:
+                    - img "Lookup" [ref=e164]
+                - group:
+                  - generic: Property Attached Y/N
+              - paragraph [ref=e166]: Equals
+            - generic [ref=e168]:
+              - generic: Address Number
+              - generic [ref=e169]:
+                - textbox "Address Number" [ref=e171]
+                - button "Advanced Options." [ref=e174] [cursor=pointer]:
+                  - img [ref=e175]
+                - group:
+                  - generic: Address Number
+            - generic [ref=e179]:
+              - generic: Address Direction Prefix
+              - generic [ref=e180]:
+                - combobox "Address Direction Prefix" [ref=e181]
+                - button "Open" [ref=e183] [cursor=pointer]:
+                  - img "Lookup" [ref=e184]
+                - group:
+                  - generic: Address Direction Prefix
+              - paragraph
+            - generic [ref=e187]:
+              - generic [ref=e188]: Address Street
+              - generic [ref=e189]:
+                - generic:
+                  - paragraph
+                - textbox "Address Street" [ref=e190]:
+                  - /placeholder: ""
+                - button "Advanced Options." [ref=e193] [cursor=pointer]:
+                  - img [ref=e194]
+                - group:
+                  - generic: Address Street
+              - paragraph [ref=e196]: Contains
+            - generic [ref=e199]:
+              - generic: Street Type
+              - generic [ref=e200]:
+                - combobox "Street Type" [ref=e201]
+                - generic [ref=e202]:
+                  - button "Advanced Options." [ref=e205] [cursor=pointer]:
+                    - img [ref=e206]
+                  - button "Open" [ref=e208] [cursor=pointer]:
+                    - img "Lookup" [ref=e209]
+                - group:
+                  - generic: Street Type
+              - paragraph [ref=e211]: Equals
+            - generic [ref=e214]:
+              - generic: Address Direction Suffix
+              - generic [ref=e215]:
+                - combobox "Address Direction Suffix" [ref=e216]
+                - button "Open" [ref=e218] [cursor=pointer]:
+                  - img "Lookup" [ref=e219]
+                - group:
+                  - generic: Address Direction Suffix
+              - paragraph
+            - generic [ref=e223]:
+              - generic: City
+              - generic [ref=e224]:
+                - combobox "City" [ref=e225]
+                - generic [ref=e226]:
+                  - button "Advanced Options." [ref=e229] [cursor=pointer]:
+                    - img [ref=e230]
+                  - button "Open" [ref=e232] [cursor=pointer]:
+                    - img "Lookup" [ref=e233]
+                - group:
+                  - generic: City
+              - paragraph [ref=e235]: Equals
+            - generic [ref=e239]:
+              - generic: County
+              - generic [ref=e240]:
+                - combobox "County" [ref=e241]
+                - generic [ref=e242]:
+                  - button "Advanced Options." [ref=e245] [cursor=pointer]:
+                    - img [ref=e246]
+                  - button "Open" [ref=e248] [cursor=pointer]:
+                    - img "Lookup" [ref=e249]
+                - group:
+                  - generic: County
+              - paragraph [ref=e251]: Equals
+            - generic [ref=e254]:
+              - generic: Zip
+              - generic [ref=e255]:
+                - combobox "Zip" [ref=e256]
+                - button "Advanced Options." [ref=e259] [cursor=pointer]:
+                  - img [ref=e260]
+                - group:
+                  - generic: Zip
+              - paragraph [ref=e262]: Contains
+            - generic [ref=e264]:
+              - generic: Bedrooms
+              - generic [ref=e265]:
+                - generic [ref=e267]:
+                  - textbox "min" [ref=e271]
+                  - textbox "max" [ref=e275]
+                - group:
+                  - generic: Bedrooms
+            - generic [ref=e277]:
+              - generic: Bedrooms Above Grade
+              - generic [ref=e278]:
+                - generic [ref=e280]:
+                  - textbox "min" [ref=e284]
+                  - textbox "max" [ref=e288]
+                - group:
+                  - generic: Bedrooms Above Grade
+            - generic [ref=e290]:
+              - generic: Bathrooms
+              - generic [ref=e291]:
+                - generic [ref=e293]:
+                  - textbox "min" [ref=e297]
+                  - textbox "max" [ref=e301]
+                - group:
+                  - generic: Bathrooms
+            - generic [ref=e303]:
+              - generic: Garage Spaces
+              - generic [ref=e304]:
+                - generic [ref=e306]:
+                  - textbox "min" [ref=e310]
+                  - textbox "max" [ref=e314]
+                - group:
+                  - generic: Garage Spaces
+            - generic [ref=e317]:
+              - generic: Basement
+              - generic [ref=e318]:
+                - combobox "Basement" [ref=e319]
+                - generic [ref=e320]:
+                  - button "Advanced Options." [ref=e323] [cursor=pointer]:
+                    - img [ref=e324]
+                  - button "Open" [ref=e326] [cursor=pointer]:
+                    - img "Lookup" [ref=e327]
+                - group:
+                  - generic: Basement
+              - paragraph [ref=e329]: Equals
+            - generic [ref=e332]:
+              - generic: School District
+              - generic [ref=e333]:
+                - combobox "School District" [ref=e334]
+                - generic [ref=e335]:
+                  - button "Advanced Options." [ref=e338] [cursor=pointer]:
+                    - img [ref=e339]
+                  - button "Open" [ref=e341] [cursor=pointer]:
+                    - img "Lookup" [ref=e342]
+                - group:
+                  - generic: School District
+              - paragraph [ref=e344]: Equals
+            - generic [ref=e347]:
+              - generic: "MLS #"
+              - generic [ref=e348]:
+                - 'combobox "MLS #" [ref=e349]'
+                - button "Advanced Options." [ref=e352] [cursor=pointer]:
+                  - img [ref=e353]
+                - group:
+                  - generic: "MLS #"
+              - paragraph [ref=e355]: Contains
+            - generic [ref=e358]:
+              - generic: Style
+              - generic [ref=e359]:
+                - combobox "Style" [ref=e360]
+                - generic [ref=e361]:
+                  - button "Advanced Options." [ref=e364] [cursor=pointer]:
+                    - img [ref=e365]
+                  - button "Open" [ref=e367] [cursor=pointer]:
+                    - img "Lookup" [ref=e368]
+                - group:
+                  - generic: Style
+              - paragraph [ref=e370]: Equals
+            - generic [ref=e373]:
+              - generic: New Construction
+              - generic [ref=e374]:
+                - combobox "New Construction" [ref=e375]
+                - generic [ref=e376]:
+                  - button "Advanced Options." [ref=e379] [cursor=pointer]:
+                    - img [ref=e380]
+                  - button "Open" [ref=e382] [cursor=pointer]:
+                    - img "Lookup" [ref=e383]
+                - group:
+                  - generic: New Construction
+              - paragraph [ref=e385]: Equals
+            - generic [ref=e387]:
+              - generic: Year Built
+              - generic [ref=e388]:
+                - generic [ref=e390]:
+                  - textbox "min" [ref=e394]
+                  - textbox "max" [ref=e398]
+                - group:
+                  - generic: Year Built
+            - generic [ref=e400]:
+              - generic: Total Finished SqFt
+              - generic [ref=e401]:
+                - generic [ref=e403]:
+                  - textbox "min" [ref=e407]
+                  - textbox "max" [ref=e411]
+                - group:
+                  - generic: Total Finished SqFt
+            - generic [ref=e414]:
+              - generic: Lot Size Range
+              - generic [ref=e415]:
+                - combobox "Lot Size Range" [ref=e416]
+                - generic [ref=e417]:
+                  - button "Advanced Options." [ref=e420] [cursor=pointer]:
+                    - img [ref=e421]
+                  - button "Open" [ref=e423] [cursor=pointer]:
+                    - img "Lookup" [ref=e424]
+                - group:
+                  - generic: Lot Size Range
+              - paragraph [ref=e426]: Equals
+            - generic [ref=e429]:
+              - generic: Subdivision
+              - generic [ref=e430]:
+                - combobox "Subdivision" [ref=e431]
+                - button "Advanced Options." [ref=e434] [cursor=pointer]:
+                  - img [ref=e435]
+                - group:
+                  - generic: Subdivision
+              - paragraph [ref=e437]: Contains
+            - generic [ref=e440]:
+              - generic: Status Date
+              - generic [ref=e441]:
+                - generic [ref=e443]:
+                  - group [ref=e446]:
+                    - generic [ref=e447]:
+                      - generic [ref=e448]:
+                        - spinbutton "Month" [ref=e449]: MM
+                        - text: /
+                      - generic [ref=e450]:
+                        - spinbutton "Day" [ref=e451]: DD
+                        - text: /
+                      - spinbutton "Year" [ref=e453]: YYYY
+                    - textbox [ref=e454]
+                  - group [ref=e457]:
+                    - generic [ref=e458]:
+                      - generic [ref=e459]:
+                        - spinbutton "Month" [ref=e460]: MM
+                        - text: /
+                      - generic [ref=e461]:
+                        - spinbutton "Day" [ref=e462]: DD
+                        - text: /
+                      - spinbutton "Year" [ref=e464]: YYYY
+                    - textbox [ref=e465]
+                - generic [ref=e466]:
+                  - button "Advanced Options." [ref=e468] [cursor=pointer]:
+                    - img [ref=e469]
+                  - button "Calendar." [ref=e472] [cursor=pointer]:
+                    - img [ref=e473]
+                - group:
+                  - generic: Status Date
+            - generic [ref=e477]:
+              - generic: List Date
+              - generic [ref=e478]:
+                - generic [ref=e480]:
+                  - group [ref=e483]:
+                    - generic [ref=e484]:
+                      - generic [ref=e485]:
+                        - spinbutton "Month" [ref=e486]: MM
+                        - text: /
+                      - generic [ref=e487]:
+                        - spinbutton "Day" [ref=e488]: DD
+                        - text: /
+                      - spinbutton "Year" [ref=e490]: YYYY
+                    - textbox [ref=e491]
+                  - group [ref=e494]:
+                    - generic [ref=e495]:
+                      - generic [ref=e496]:
+                        - spinbutton "Month" [ref=e497]: MM
+                        - text: /
+                      - generic [ref=e498]:
+                        - spinbutton "Day" [ref=e499]: DD
+                        - text: /
+                      - spinbutton "Year" [ref=e501]: YYYY
+                    - textbox [ref=e502]
+                - generic [ref=e503]:
+                  - button "Advanced Options." [ref=e505] [cursor=pointer]:
+                    - img [ref=e506]
+                  - button "Calendar." [ref=e509] [cursor=pointer]:
+                    - img [ref=e510]
+                - group:
+                  - generic: List Date
+            - generic [ref=e514]:
+              - generic: Off Market Date
+              - generic [ref=e515]:
+                - textbox [disabled] [ref=e517]
+                - generic [ref=e518]:
+                  - generic [ref=e519]:
+                    - button "Advanced Options." [disabled]:
+                      - img
+                  - generic [ref=e520]:
+                    - button "Calendar." [disabled]:
+                      - img
+                - group:
+                  - generic: Off Market Date
+            - generic [ref=e523]:
+              - generic: Closing Date
+              - generic [ref=e524]:
+                - textbox [disabled] [ref=e526]
+                - generic [ref=e527]:
+                  - generic [ref=e528]:
+                    - button "Advanced Options." [disabled]:
+                      - img
+                  - generic [ref=e529]:
+                    - button "Calendar." [disabled]:
+                      - img
+                - group:
+                  - generic: Closing Date
+            - generic [ref=e532]:
+              - generic: Sale/Rent
+              - generic [ref=e533]:
+                - combobox "Sale/Rent" [ref=e534]
+                - generic [ref=e535]:
+                  - button "Advanced Options." [ref=e538] [cursor=pointer]:
+                    - img [ref=e539]
+                  - button "Open" [ref=e541] [cursor=pointer]:
+                    - img "Lookup" [ref=e542]
+                - group:
+                  - generic: Sale/Rent
+              - paragraph [ref=e544]: Equals
+            - generic [ref=e547]:
+              - generic [ref=e548]: Listing Visibility Type
+              - generic [ref=e549]:
+                - button "Active Remove option." [ref=e550]:
+                  - generic [ref=e551]: Active
+                  - button "Remove option." [ref=e553] [cursor=pointer]:
+                    - img [ref=e554]
+                - combobox "Listing Visibility Type" [ref=e556]
+                - button "Open" [ref=e558] [cursor=pointer]:
+                  - img "Lookup" [ref=e559]
+                - group:
+                  - generic: Listing Visibility Type
+              - paragraph
+            - generic [ref=e563]:
+              - generic: Legal Description
+              - generic [ref=e564]:
+                - combobox "Legal Description" [ref=e565]
+                - button "Advanced Options." [ref=e568] [cursor=pointer]:
+                  - img [ref=e569]
+                - group:
+                  - generic: Legal Description
+              - paragraph [ref=e571]: Contains
+            - generic [ref=e573]:
+              - generic: "# of Fireplaces"
+              - generic [ref=e574]:
+                - generic [ref=e576]:
+                  - textbox "min" [ref=e580]
+                  - textbox "max" [ref=e584]
+                - group:
+                  - generic: "# of Fireplaces"
+            - generic [ref=e587]:
+              - generic: Other Room 1 Name
+              - generic [ref=e588]:
+                - combobox "Other Room 1 Name" [ref=e589]
+                - generic [ref=e590]:
+                  - button "Advanced Options." [ref=e593] [cursor=pointer]:
+                    - img [ref=e594]
+                  - button "Open" [ref=e596] [cursor=pointer]:
+                    - img "Lookup" [ref=e597]
+                - group:
+                  - generic: Other Room 1 Name
+              - paragraph [ref=e599]: Equals
+            - generic [ref=e602]:
+              - generic: Other Room 2 Name
+              - generic [ref=e603]:
+                - combobox "Other Room 2 Name" [ref=e604]
+                - generic [ref=e605]:
+                  - button "Advanced Options." [ref=e608] [cursor=pointer]:
+                    - img [ref=e609]
+                  - button "Open" [ref=e611] [cursor=pointer]:
+                    - img "Lookup" [ref=e612]
+                - group:
+                  - generic: Other Room 2 Name
+              - paragraph [ref=e614]: Equals
+            - generic [ref=e617]:
+              - generic: Other Room 3 Name
+              - generic [ref=e618]:
+                - combobox "Other Room 3 Name" [ref=e619]
+                - generic [ref=e620]:
+                  - button "Advanced Options." [ref=e623] [cursor=pointer]:
+                    - img [ref=e624]
+                  - button "Open" [ref=e626] [cursor=pointer]:
+                    - img "Lookup" [ref=e627]
+                - group:
+                  - generic: Other Room 3 Name
+              - paragraph [ref=e629]: Equals
+            - generic [ref=e632]:
+              - generic: Other Room 4 Name
+              - generic [ref=e633]:
+                - combobox "Other Room 4 Name" [ref=e634]
+                - generic [ref=e635]:
+                  - button "Advanced Options." [ref=e638] [cursor=pointer]:
+                    - img [ref=e639]
+                  - button "Open" [ref=e641] [cursor=pointer]:
+                    - img "Lookup" [ref=e642]
+                - group:
+                  - generic: Other Room 4 Name
+              - paragraph [ref=e644]: Equals
+            - generic [ref=e647]:
+              - generic: Other Room 5 Name
+              - generic [ref=e648]:
+                - combobox "Other Room 5 Name" [ref=e649]
+                - generic [ref=e650]:
+                  - button "Advanced Options." [ref=e653] [cursor=pointer]:
+                    - img [ref=e654]
+                  - button "Open" [ref=e656] [cursor=pointer]:
+                    - img "Lookup" [ref=e657]
+                - group:
+                  - generic: Other Room 5 Name
+              - paragraph [ref=e659]: Equals
+            - generic [ref=e662]:
+              - generic: Grade School
+              - generic [ref=e663]:
+                - combobox "Grade School" [ref=e664]
+                - generic [ref=e665]:
+                  - button "Advanced Options." [ref=e668] [cursor=pointer]:
+                    - img [ref=e669]
+                  - button "Open" [ref=e671] [cursor=pointer]:
+                    - img "Lookup" [ref=e672]
+                - group:
+                  - generic: Grade School
+              - paragraph [ref=e674]: Equals
+            - generic [ref=e677]:
+              - generic: High School
+              - generic [ref=e678]:
+                - combobox "High School" [ref=e679]
+                - generic [ref=e680]:
+                  - button "Advanced Options." [ref=e683] [cursor=pointer]:
+                    - img [ref=e684]
+                  - button "Open" [ref=e686] [cursor=pointer]:
+                    - img "Lookup" [ref=e687]
+                - group:
+                  - generic: High School
+              - paragraph [ref=e689]: Equals
+            - generic [ref=e692]:
+              - generic: Jr. High School
+              - generic [ref=e693]:
+                - combobox "Jr. High School" [ref=e694]
+                - generic [ref=e695]:
+                  - button "Advanced Options." [ref=e698] [cursor=pointer]:
+                    - img [ref=e699]
+                  - button "Open" [ref=e701] [cursor=pointer]:
+                    - img "Lookup" [ref=e702]
+                - group:
+                  - generic: Jr. High School
+              - paragraph [ref=e704]: Equals
+      - generic [ref=e705]:
+        - heading "Secondary Criteria Customize Secondary Criteria. Caret" [level=3] [ref=e706]:
+          - button "Secondary Criteria Customize Secondary Criteria. Caret" [ref=e707] [cursor=pointer]:
+            - generic [ref=e710]:
+              - paragraph [ref=e712]: Secondary Criteria
+              - button "Customize Secondary Criteria." [ref=e715]:
+                - img [ref=e716]
+            - img "Caret" [ref=e719]
+        - generic: Features
+        - generic: Features
+        - generic: Features
+        - generic: REO (Bank, ETC, OWNED)Y/N
+        - generic: HOA (Y/N)
+        - generic: Special Assessments
+        - generic: SID Y/N
+        - generic: Public Remarks
+        - generic: Agent Remarks
+        - generic: Multiple Address
+      - generic [ref=e721]:
+        - heading "Advanced Criteria Customize Advanced Criteria. Caret" [level=3] [ref=e722]:
+          - button "Advanced Criteria Customize Advanced Criteria. Caret" [ref=e723] [cursor=pointer]:
+            - generic [ref=e726]:
+              - paragraph [ref=e728]: Advanced Criteria
+              - button "Customize Advanced Criteria." [ref=e731]:
+                - img [ref=e732]
+            - img "Caret" [ref=e735]
+        - generic: Word Search
+        - generic: Listing Agent
+        - generic: Listing Office
+        - generic: Selling Agent
+        - generic: Selling Office
+  - alert [ref=e737]
