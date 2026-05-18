@@ -577,7 +577,7 @@ async function scrapeDocuments(page) {
       page.context().on('request', onRequest);
 
       const [newTab] = await Promise.all([
-        page.context().waitForEvent('page', { timeout: 10000 }),
+        page.context().waitForEvent('page', { timeout: 5000 }),
         page.evaluate((idx) => {
           for (var btn of document.querySelectorAll('button[aria-expanded]')) {
             var c = btn.querySelector('.MuiAccordionSummary-content') || btn.querySelector('p');
@@ -595,8 +595,12 @@ async function scrapeDocuments(page) {
 
       console.log(`[docs] new tab initial URL: ${newTab.url()}`);
 
-      // Allow time for the request event to fire before we read capturedPdfUrl.
-      await newTab.waitForLoadState('domcontentloaded').catch(() => {});
+      // The 'request' event fires before the tab opens, so capturedPdfUrl is
+      // already set by the time waitForEvent('page') resolves. Remove the
+      // listener immediately — waiting for domcontentloaded is wrong here
+      // because headless Chrome aborts PDF navigations before the frame ever
+      // commits, so domcontentloaded never fires and Playwright burns its full
+      // 30-second default timeout per document.
       page.context().off('request', onRequest);
 
       const url = capturedPdfUrl || (/^https?:\/\//.test(newTab.url()) ? newTab.url() : null) || newTab.url();
