@@ -216,6 +216,18 @@ function typeFull(val) {
 }
 
 /**
+ * Strip an ordinal suffix (st/nd/rd/th) from a purely numeric street name,
+ * e.g. "47th" -> "47", "152nd" -> "152". Paragon's search field expects the
+ * bare number for numbered streets — searching "47th" verbatim returns zero
+ * results even when the listing exists under "47".
+ */
+function stripOrdinal(street) {
+  if (!street) return undefined;
+  const m = /^(\d+)(st|nd|rd|th)$/i.exec(street.trim());
+  return m ? m[1] : undefined;
+}
+
+/**
  * Deduplicate variations by a stable key.
  */
 function uniq(list) {
@@ -241,6 +253,7 @@ function uniq(list) {
  *
  * Ladder:
  *   1. As-entered (after stripping city/state/zip)
+ *   1b. Ordinal suffix stripped (47th -> 47), plus type expanded/contracted
  *   2. Direction expanded (N → North) — keep original type
  *   3. Direction contracted (North → N) — keep original type
  *   4. Type expanded (St → Street)
@@ -255,8 +268,9 @@ function uniq(list) {
  *     label: "human-readable label of what changed"
  *   }
  *
- * Cap at 6 attempts per decisions.md ("~4 attempts" is soft guidance; we
- * bump to 6 to cover the combined expand/contract rungs cleanly).
+ * Cap at 11 attempts per decisions.md ("~4 attempts" is soft guidance; we
+ * bump this up to cover the combined expand/contract rungs plus the
+ * ordinal-suffix rungs cleanly).
  */
 function buildVariations(rawAddress) {
   const stripped = stripCityStateZip(rawAddress);
@@ -272,6 +286,25 @@ function buildVariations(rawAddress) {
 
   // 1. As-entered
   push(base, 'as entered');
+
+  // 1b. Ordinal suffix stripped (numbered streets only), e.g. "47th" -> "47".
+  // Tried early since this is a common real-world miss: Paragon's search
+  // field wants the bare number, not the ordinal word.
+  const strippedStreet = stripOrdinal(base.street);
+  if (strippedStreet) {
+    push({ ...base, street: strippedStreet }, 'ordinal suffix stripped');
+
+    if (base.type) {
+      const full = typeFull(base.type);
+      if (full && full !== base.type) {
+        push({ ...base, street: strippedStreet, type: full }, 'ordinal suffix stripped + street type expanded');
+      }
+      const abbr = typeAbbr(base.type);
+      if (abbr && abbr !== base.type) {
+        push({ ...base, street: strippedStreet, type: abbr }, 'ordinal suffix stripped + street type contracted');
+      }
+    }
+  }
 
   // 2. Direction expanded
   if (base.direction) {
@@ -333,7 +366,7 @@ function buildVariations(rawAddress) {
     );
   }
 
-  return uniq(variations).slice(0, 8);
+  return uniq(variations).slice(0, 11);
 }
 
 module.exports = {

@@ -351,6 +351,17 @@ async function openListing(page, mls) {
 }
 
 async function expandAllFieldsDetail(page) {
+  // The "Property Details" accordion is collapsed by default
+  // (aria-expanded="false"), which hides the "All Fields Detail" link from
+  // interaction. Expand it first, same pattern as the Documents/Property
+  // History accordions.
+  const detailsHeading = page.getByRole('button', { name: /^Property Details\b/i }).first();
+  const detailsExpanded = await detailsHeading.getAttribute('aria-expanded').catch(() => 'false');
+  if (detailsExpanded !== 'true') {
+    await detailsHeading.click();
+    await page.waitForSelector('button[aria-expanded="true"]', { timeout: 5000 }).catch(() => {});
+  }
+
   // Click the pink "All Fields Detail" link inside Property Details.
   // Use force: true to bypass actionability checks — a MUI-generated overlay
   // (css-tnlpd7 inside css-12tfjcl) intercepts pointer events in headless
