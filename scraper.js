@@ -821,7 +821,10 @@ async function scrapeAgentContacts(page) {
 
       // INFO opens a MUI Drawer (role="dialog"). There are always multiple drawers in
       // the DOM; wait for the specific one containing "Agent Information" to go visible.
-      const drawer = page.locator('[role="dialog"]').filter({ hasText: 'Agent Information' });
+      // There are always multiple agent drawers in the DOM; scope to the one
+      // just opened (visible) and take .first() so a strict-mode multi-match
+      // can't throw and silently drop this agent.
+      const drawer = page.locator('[role="dialog"]:visible').filter({ hasText: 'Agent Information' }).first();
       await drawer.waitFor({ state: 'visible', timeout: 6000 });
 
       const agent = await drawer.evaluate((el) => {
@@ -834,11 +837,18 @@ async function scrapeAgentContacts(page) {
         });
         while (walker.nextNode()) texts.push(walker.currentNode.textContent.trim());
 
+        // The field labels rendered in the drawer. getAfter pairs a label with
+        // the text node that follows it; if that next node is itself another
+        // label, the value is absent and we must return null rather than
+        // mistaking the following label for the value (which scrambled names).
+        const LABELS = new Set(['First Name', 'Last Name', 'Office', 'Email Address', 'Agent Information']);
+
         function getAfter(label) {
           const idx = texts.indexOf(label);
           if (idx === -1) return null;
           for (let j = idx + 1; j < texts.length; j++) {
-            if (texts[j]) return texts[j];
+            if (!texts[j]) continue;
+            return LABELS.has(texts[j]) ? null : texts[j];
           }
           return null;
         }
@@ -852,10 +862,14 @@ async function scrapeAgentContacts(page) {
           ? (emailAnchor.getAttribute('href').replace(/^mailto:/, '') || emailAnchor.textContent.trim())
           : (getAfter('Email Address') || null);
 
+        // Only trust a real tel: anchor for the phone. The previous
+        // getAfter('M') fallback matched any stray "M" text node and returned
+        // whatever followed it, producing wrong numbers — a missing phone is
+        // better than a wrong one.
         const phoneAnchor = el.querySelector('a[href^="tel:"]');
         const phone = phoneAnchor
           ? (phoneAnchor.textContent.trim() || phoneAnchor.getAttribute('href').replace(/^tel:/, ''))
-          : (getAfter('M') || null);
+          : null;
 
         return {
           name:      [firstName, lastName].filter(Boolean).join(' ') || null,
@@ -882,6 +896,38 @@ async function scrapeAgentContacts(page) {
   }
 
   return agents;
+}
+
+/**
+ * Order the scraped agent contacts so the authoritative listing agent leads.
+ *
+ * The Agent/Office accordion lists co-list agents and — once a listing is
+ * under contract — the selling agent too, in no guaranteed order, so the raw
+ * first entry is not necessarily the listing agent. Reconcile against the
+ * "Listing Agent"/"Listing Office" fields from the All Fields Detail, which
+ * are Paragon's own source of truth. If the listing agent isn't among the
+ * scraped contacts (e.g. the accordion parse missed it), synthesize a minimal
+ * entry from those fields so the correct name always leads.
+ */
+function orderAgents(agents, fields) {
+  const list = Array.isArray(agents) ? agents.slice() : [];
+  const listingName = ((fields && fields['Listing Agent']) || '').trim();
+  if (!listingName) return list;
+
+  const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const target = norm(listingName);
+  const idx = list.findIndex((a) => norm(a.name) === target);
+  if (idx === 0) return list;
+  if (idx > 0) {
+    const [primary] = list.splice(idx, 1);
+    list.unshift(primary);
+    return list;
+  }
+
+  // Listing agent not found among the scraped contacts — lead with the
+  // authoritative field values (per-agent contact details are unknown here).
+  const office = ((fields && fields['Listing Office']) || '').trim() || null;
+  return [{ name: listingName, email: null, phone: null, brokerage: office }, ...list];
 }
 
 // --------------------------------------------------------------------------
@@ -1006,8 +1052,11 @@ async function scrapeListing(page, query, timings = {}) {
   doneHistory();
 
   const doneAgents = mark('scrape_agents_ms');
-  const agents = await scrapeAgentContacts(page);
+  let agents = await scrapeAgentContacts(page);
   doneAgents();
+  // Put the authoritative listing agent first so agents[0] (used by the UI and
+  // history list) is the listing agent, not whichever contact rendered first.
+  agents = orderAgents(agents, fields);
 
   const coverPhotoUrl = cardCoverPhoto || (await scrapeCoverPhoto(page, best.mls));
 
@@ -1046,6 +1095,7 @@ module.exports = {
   scrapeDocuments,
   scrapeHistory,
   scrapeAgentContacts,
+  orderAgents,
   scrapeCoverPhoto,
   // top-level
   scrapeListing,
